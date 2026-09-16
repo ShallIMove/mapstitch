@@ -79,7 +79,7 @@
   "enchantment.mapstitch.globetrotter.desc": "Позволяет атласу создавать карты, используя бумагу вместо пустых карт.",
 
   "mapstitch.require_compass_for_pos": "Требовать компас для местоположения",
-  "gamerule.mapstitch.require_compass_for_pos": "Требовать компас для  отображения местоположения на мини-карте и карте мира",
+  "gamerule.mapstitch.require_compass_for_pos": "Требовать компас для отображения местоположения на мини-карте и карте мира",
   "mapstitch.max_atlas_items": "Макс. предметов в атласе",
   "gamerule.mapstitch.max_atlas_items": "Максимальное количество предметов в атласе",
 
