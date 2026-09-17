@@ -86,6 +86,8 @@ public class AtlasItem extends Item {
 		if (initialContents != null) {
 			ItemStack other = slot.getItem();
 			BundleContents.Mutable contents = new BundleContents.Mutable(initialContents);
+            BundleContentsMutableExtension ext = (BundleContentsMutableExtension) contents;
+            ext.mapstitch$setIsAtlas();
 			if (clickAction == ClickAction.PRIMARY && !other.isEmpty() && isValidItemForAtlas(other, self, player.level())) {
 				if (contents.tryTransfer(slot, player) > 0) {
 					playInsertSound(player);
@@ -99,7 +101,7 @@ public class AtlasItem extends Item {
 				return true;
 			} else if (clickAction == ClickAction.SECONDARY && other.isEmpty()) {
 				boolean filledMapsFirst = self.getOrDefault(ModDataComponents.ATLAS_EJECT_FILLED_MAPS_FIRST, true);
-				ItemStack itemStack = ((BundleContentsMutableExtension) contents).mapstitch$removeOneStackOrdered(filledMapsFirst);
+				ItemStack itemStack = ext.mapstitch$removeOneStackOrdered(filledMapsFirst);
 				if (itemStack != null) {
 					ItemStack remainder = slot.safeInsert(itemStack);
 					if (remainder.getCount() > 0 && isValidItemForAtlas(remainder, self, player.level())) {
@@ -134,6 +136,8 @@ public class AtlasItem extends Item {
 			BundleContents initialContents = self.get(DataComponents.BUNDLE_CONTENTS);
 			if (initialContents != null) {
 				BundleContents.Mutable contents = new BundleContents.Mutable(initialContents);
+                BundleContentsMutableExtension ext = (BundleContentsMutableExtension) contents;
+                ext.mapstitch$setIsAtlas();
 				if (clickAction == ClickAction.PRIMARY && !other.isEmpty() && isValidItemForAtlas(other, self, player.level())) {
 					if (slot.allowModification(player) && contents.tryInsert(other) > 0) {
 						playInsertSound(player);
@@ -148,7 +152,7 @@ public class AtlasItem extends Item {
 				} else if (clickAction == ClickAction.SECONDARY && other.isEmpty()) {
 					if (slot.allowModification(player)) {
 						boolean filledMapsFirst = self.getOrDefault(ModDataComponents.ATLAS_EJECT_FILLED_MAPS_FIRST, true);
-						ItemStack removed = ((BundleContentsMutableExtension) contents).mapstitch$removeOneStackOrdered(filledMapsFirst);
+						ItemStack removed = ext.mapstitch$removeOneStackOrdered(filledMapsFirst);
 						if (removed != null) {
 							playRemoveOneSound(player);
 							carriedItem.set(removed);
@@ -382,8 +386,9 @@ public class AtlasItem extends Item {
 					Vector2i center = new Vector2i(centerX, centerZ);
 					if (!cachedCenters.contains(Pair.of(center, mapData.dimension.identifier()))) {
 						BundleContents.Mutable mutableContents = new BundleContents.Mutable(contents);
-						//noinspection DataFlowIssue
-						((BundleContentsMutableExtension) mutableContents).mapstitch$removeOneItemAtIndex(emptyMapIndex);
+                        BundleContentsMutableExtension ext = (BundleContentsMutableExtension) mutableContents;
+                        ext.mapstitch$setIsAtlas();
+                        ext.mapstitch$removeOneItemAtIndex(emptyMapIndex);
 						newMap.set(ModDataComponents.MAP_CENTER, new Vector2i(centerX, centerZ));
                         ((MapItem) newMap.getItem()).update(level, owner, mapData);
 						mutableContents.tryInsert(newMap);

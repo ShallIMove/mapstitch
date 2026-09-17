@@ -1,4 +1,1 @@
-- Added keybind to toggle the minimap, unbound by default.
-- Fixed missing datapack names.
-- Fixed keybind categories displaying incorrectly.
-- Fixed Trinkets compatibility on Fabric 1.21.1.
+- Fixed a bug that allowed regular bundles to store more items than they should.

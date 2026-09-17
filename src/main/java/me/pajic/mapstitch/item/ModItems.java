@@ -3,7 +3,6 @@ package me.pajic.mapstitch.item;
 import me.pajic.mapstitch.MapStitch;
 import me.pajic.mapstitch.compat.AccessoryUtil;
 import me.pajic.mapstitch.component.ModDataComponents;
-import me.pajic.mapstitch.extension.BundleContentsExtension;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
@@ -17,7 +16,6 @@ public class ModItems {
 
 	private static Item.Properties createAtlasProperties() {
 		BundleContents contents = BundleContents.EMPTY;
-		((BundleContentsExtension) (Object) contents).mapstitch$setIsAtlas();
 		return new Item.Properties()
 				.component(DataComponents.BUNDLE_CONTENTS, contents)
 				.component(ModDataComponents.ATLAS_FULLNESS, 0)
