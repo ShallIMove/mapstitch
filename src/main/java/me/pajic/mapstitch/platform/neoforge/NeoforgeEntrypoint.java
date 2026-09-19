@@ -13,6 +13,7 @@ import me.pajic.mapstitch.networking.payload.C2SPlaySound;
 import me.pajic.mapstitch.networking.payload.C2SSetEjectMode;
 import me.pajic.mapstitch.networking.payload.S2CDimensionIds;
 import me.pajic.mapstitch.networking.payload.S2COpenWorldMapScreen;
+import me.pajic.mapstitch.networking.payload.S2CPlaySound;
 import me.pajic.mapstitch.networking.payload.S2CSyncWorldMap;
 import me.pajic.mapstitch.recipe.ModRecipes;
 import me.pajic.mapstitch.util.CompatFlags;
@@ -78,6 +79,9 @@ public class NeoforgeEntrypoint {
         );
         registrar.playToClient(S2CSyncWorldMap.TYPE, S2CSyncWorldMap.CODEC
                 /^? <26.1 {^/, (payload, context) -> ClientNetworkEvents.syncWorldMapScreen()/^?}^/
+        );
+        registrar.playToClient(S2CPlaySound.TYPE, S2CPlaySound.CODEC
+                /^? <26.1 {^/, (payload, context) -> ClientNetworkEvents.playSound(context.player(), payload.sound())/^?}^/
         );
         registrar.playToServer(C2SPlaySound.TYPE, C2SPlaySound.CODEC, (payload, context) ->
                 ServerNetworkEvents.playSound(payload, context.player())

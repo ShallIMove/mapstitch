@@ -21,6 +21,7 @@ import net.neoforged.neoforge.client.network.event.RegisterClientPayloadHandlers
 import me.pajic.mapstitch.networking.ClientNetworkEvents;
 import me.pajic.mapstitch.networking.payload.S2CDimensionIds;
 import me.pajic.mapstitch.networking.payload.S2COpenWorldMapScreen;
+import me.pajic.mapstitch.networking.payload.S2CPlaySound;
 import me.pajic.mapstitch.networking.payload.S2CSyncWorldMap;
 ^///?} else {
 import me.pajic.mapstitch.component.ModDataComponents;
@@ -77,6 +78,9 @@ public class NeoforgeClientEventSubscriber {
         );
         event.register(S2CSyncWorldMap.TYPE, (payload, context) ->
                 ClientNetworkEvents.syncWorldMapScreen()
+        );
+        event.register(S2CPlaySound.TYPE, (payload, context) ->
+                ClientNetworkEvents.playSound(context.player(), payload.sound())
         );
     }
     ^///?}

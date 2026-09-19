@@ -27,7 +27,6 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.BundleContents;
 import net.minecraft.world.level.saveddata.maps.MapId;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
@@ -336,7 +335,7 @@ public class WorldMapScreen extends Screen {
         boolean hasAnyMaps = false;
         //~ if <26.1 'ItemStackTemplate' -> 'ItemStack'
         for (ItemStackTemplate map : contents.items()) {
-            if (map.is(Items.FILLED_MAP)) {
+            if (map.get(DataComponents.MAP_ID) != null) {
                 hasAnyMaps = true;
                 MapId id = map.get(DataComponents.MAP_ID);
                 Vector2i mapCenter = map.get(ModDataComponents.MAP_CENTER);
@@ -344,9 +343,11 @@ public class WorldMapScreen extends Screen {
                     MapItemSavedData data = MC.level.getMapData(id);
                     if (data != null && dimensionId.equals(data.dimension.identifier())) {
                         //~ if <26.1 'MapRenderState.MapDecorationRenderState' -> 'MapDecoration'
-                        List<MapRenderState.MapDecorationRenderState> explorationDecors = ModClientUtil.extractDecors(data, id, MC, true);
-                        if (explorationDecors.isEmpty()) MAPS.put(worldToGrid(mapCenter.x, mapCenter.y, data.scale), new MapDataWithId(id, data));
-                        else EXPLORATION_MARKERS.put(worldToGrid(mapCenter.x, mapCenter.y, data.scale), new MapDecorsWithId(id, explorationDecors));
+                        List<MapRenderState.MapDecorationRenderState> decors = ModClientUtil.extractDecors(data, id, MC);
+                        if (ModClientUtil.isExplorationMap(decors, map/*? >=26.1 {*/.create()/*?}*/)) {
+                            EXPLORATION_MARKERS.put(worldToGrid(mapCenter.x, mapCenter.y, data.scale), new MapDecorsWithId(id, decors));
+                        }
+                        else MAPS.put(worldToGrid(mapCenter.x, mapCenter.y, data.scale), new MapDataWithId(id, data));
                     }
                 }
             }
@@ -665,7 +666,8 @@ public class WorldMapScreen extends Screen {
     //~ if <26.1 '@NotNull MouseButtonEvent event' -> 'double mouseX, double mouseY, int button'
 	public boolean mouseDragged(@NotNull MouseButtonEvent event, double dx, double dy) {
         //~ if <26.1 'event.button()' -> 'button'
-		if (event.button() == 0) {
+        //~ if >26.2 '0' -> '1'
+		if (event.button() == 1) {
 			camX -= dx / zoom;
 			camZ -= dy / zoom;
 			return true;

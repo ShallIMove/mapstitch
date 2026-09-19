@@ -12,6 +12,7 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.FastColor;
+import net.minecraft.world.item.component.BundleContents;
 import net.minecraft.world.level.saveddata.maps.MapId;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
 import org.jetbrains.annotations.Nullable;
@@ -84,6 +85,11 @@ public class Util1_21_1 implements MultiVersionUtil {
         vc.addVertex(m4f, 1.0F, 1.0F, -0.001F).setColor(-1).setUv(spr.getU1(), spr.getV0()).setLight(15728880);
         vc.addVertex(m4f, 1.0F, -1.0F, -0.001F).setColor(-1).setUv(spr.getU1(), spr.getV1()).setLight(15728880);
         vc.addVertex(m4f, -1.0F, -1.0F, -0.001F).setColor(-1).setUv(spr.getU0(), spr.getV1()).setLight(15728880);
+    }
+
+    @Override
+    public BundleContents.Mutable toMutable(BundleContents contents) {
+        return new BundleContents.Mutable(contents);
     }
 }
 *///?}

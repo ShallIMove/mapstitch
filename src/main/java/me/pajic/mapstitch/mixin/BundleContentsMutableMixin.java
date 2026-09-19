@@ -12,11 +12,17 @@ import net.minecraft.world.item.component.BundleContents;
 import org.apache.commons.lang3.math.Fraction;
 import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.Opcodes;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
+
+//? <26.3 {
+/*import org.spongepowered.asm.mixin.Final;
+*///?} else {
+import me.pajic.mapstitch.mixin.accessor.SimpleMutableContainerAccessor;
+import net.minecraft.world.item.component.SimpleMutableContainer;
+//?}
 
 import java.util.List;
 
@@ -24,11 +30,23 @@ import java.util.List;
 @Mixin(BundleContents.Mutable.class)
 public abstract class BundleContentsMutableMixin implements BundleContentsMutableExtension {
 
-    @Shadow @Final private List<ItemStack> items;
     @Shadow private Fraction weight;
+
     @Shadow @Nullable public abstract ItemStack removeOne();
 
     @Unique private boolean mapstitch$isAtlas = false;
+
+    //? <26.3
+    //@Shadow @Final private List<ItemStack> items;
+    @Unique private List<ItemStack> mapstitch$items() {
+        //? <26.3 {
+        /*return items;
+        *///?} else {
+        @SuppressWarnings({"DataFlowIssue", "unchecked"})
+        SimpleMutableContainer<BundleContents> self = (SimpleMutableContainer<BundleContents>) (Object) this;
+        return ((SimpleMutableContainerAccessor) self).mapstitch$getItems();
+        //?}
+    }
 
     @Override
     public void mapstitch$setIsAtlas() {
@@ -37,12 +55,12 @@ public abstract class BundleContentsMutableMixin implements BundleContentsMutabl
 
     @Override
     public ItemStack mapstitch$removeOneItemAtIndex(int index) {
-        if (!items.isEmpty()) {
-            ItemStack stack = items.get(index).copy();
+        if (!mapstitch$items().isEmpty()) {
+            ItemStack stack = mapstitch$items().get(index).copy();
             ItemStack removed = stack.split(1);
             weight = weight.subtract(BundleContentsAccessor.getWeight(stack).getOrThrow().multiplyBy(Fraction.getFraction(stack.getCount(), 1)));
-            if (stack.isEmpty()) items.remove(index);
-            else items.set(index, stack);
+            if (stack.isEmpty()) mapstitch$items().remove(index);
+            else mapstitch$items().set(index, stack);
             return removed;
         }
         return ItemStack.EMPTY;
@@ -50,11 +68,11 @@ public abstract class BundleContentsMutableMixin implements BundleContentsMutabl
 
     @Override
     public ItemStack mapstitch$removeOneStackOrdered(boolean filledMapsFirst) {
-        if (!items.isEmpty()) {
+        if (!mapstitch$items().isEmpty()) {
             if (filledMapsFirst) {
                 int filledMapIndex = -1;
-                for (int i = 0; i < items.size(); i++) {
-                    ItemStack stack = items.get(i);
+                for (int i = 0; i < mapstitch$items().size(); i++) {
+                    ItemStack stack = mapstitch$items().get(i);
                     if (stack.is(Items.FILLED_MAP)) {
                         filledMapIndex = i;
                         break;
@@ -62,14 +80,14 @@ public abstract class BundleContentsMutableMixin implements BundleContentsMutabl
                 }
                 if (filledMapIndex == -1) return removeOne();
                 else {
-                    ItemStack stack = items.remove(filledMapIndex).copy();
+                    ItemStack stack = mapstitch$items().remove(filledMapIndex).copy();
                     weight = weight.subtract(BundleContentsAccessor.getWeight(stack).getOrThrow().multiplyBy(Fraction.getFraction(stack.getCount(), 1)));
                     return stack;
                 }
             } else {
                 int emptyMapIndex = -1;
-                for (int i = 0; i < items.size(); i++) {
-                    ItemStack stack = items.get(i);
+                for (int i = 0; i < mapstitch$items().size(); i++) {
+                    ItemStack stack = mapstitch$items().get(i);
                     if (stack.is(Items.MAP) || stack.is(Items.PAPER)) {
                         emptyMapIndex = i;
                         break;
@@ -77,7 +95,7 @@ public abstract class BundleContentsMutableMixin implements BundleContentsMutabl
                 }
                 if (emptyMapIndex == -1) return removeOne();
                 else {
-                    ItemStack stack = items.remove(emptyMapIndex).copy();
+                    ItemStack stack = mapstitch$items().remove(emptyMapIndex).copy();
                     weight = weight.subtract(BundleContentsAccessor.getWeight(stack).getOrThrow().multiplyBy(Fraction.getFraction(stack.getCount(), 1)));
                     return stack;
                 }
@@ -99,7 +117,8 @@ public abstract class BundleContentsMutableMixin implements BundleContentsMutabl
     }
 
     @WrapOperation(
-            method = "findStackIndex",
+            //~ if >=26.3 'findStackIndex' -> 'findStackIndexWithinRange'
+            method = "findStackIndexWithinRange",
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/world/item/ItemStack;isSameItemSameComponents(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemStack;)Z"

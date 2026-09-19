@@ -1,19 +1,19 @@
 package me.pajic.mapstitch.platform;
 
 //$ version_util_import
-import me.pajic.mapstitch.platform.version.Util26_2;
+import me.pajic.mapstitch.platform.version.Util26_3;
 import me.pajic.mapstitch.worldmap.WorldMapScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.resources.Identifier;
-import net.minecraft.world.level.saveddata.maps.MapId;
+import net.minecraft.world.item.component.BundleContents;import net.minecraft.world.level.saveddata.maps.MapId;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
 import org.jetbrains.annotations.Nullable;
 
 public interface MultiVersionUtil {
 
-    MultiVersionUtil INSTANCE = /*$ version_util_inst*/ new Util26_2();
+    MultiVersionUtil INSTANCE = /*$ version_util_inst*/ new Util26_3();
 
     void pushPose(GuiGraphicsExtractor graphics);
     void popPose(GuiGraphicsExtractor graphics);
@@ -27,4 +27,5 @@ public interface MultiVersionUtil {
     void blit(GuiGraphicsExtractor graphics, Identifier texture, int x, int y, float u, float v, int w, int h, int tw, int th);
     void blitSprite(GuiGraphicsExtractor graphics, Identifier texture, int x, int y, int w, int h);
     void blitDecorSprite(Minecraft mc, GuiGraphicsExtractor graphics, TextureAtlasSprite spr);
+    BundleContents.Mutable toMutable(BundleContents contents);
 }

@@ -21,6 +21,7 @@ public class ModClientConfig extends Config {
     public Minimap minimap = new Minimap();
     public WorldMap worldMap = new WorldMap();
     public MinimapInfo minimapInfo = new MinimapInfo();
+    public Sounds sounds = new Sounds();
 
     public static class Minimap extends ConfigSection {
         public ValidatedEnum<MinimapPosition> position = new ValidatedEnum<>(MinimapPosition.TOP_RIGHT);
@@ -46,5 +47,9 @@ public class ModClientConfig extends Config {
         public ValidatedBoolean coordinates = new ValidatedBoolean(false);
         public ValidatedBoolean biome = new ValidatedBoolean(false);
         public ValidatedBoolean weather = new ValidatedBoolean(false);
+    }
+
+    public static class Sounds extends ConfigSection {
+        public ValidatedBoolean atlasMapCreation = new ValidatedBoolean();
     }
 }

@@ -24,6 +24,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+//? >=26.3
+import net.minecraft.tags.ItemTags;
+
 //? >=26.1 {
 import net.minecraft.client.renderer.state.MapRenderState;
 import net.minecraft.world.item.ItemStackTemplate;
@@ -70,43 +73,41 @@ public class ModClientUtil {
         });
     }
 
-    public static boolean isExplorationMarker(Holder<MapDecorationType> type) {
-        return type.value().explorationMapElement() || type.is(MapDecorationTypes.RED_X.unwrapKey().orElseThrow());
-    }
-
     //~ if <26.1 'MapRenderState.MapDecorationRenderState' -> 'MapDecoration'
-    public static boolean isExplorationMap(List<MapRenderState.MapDecorationRenderState> decors) {
-        //~ if <26.1 'MapRenderState.MapDecorationRenderState' -> 'MapDecoration'
+    public static boolean isExplorationMap(List<MapRenderState.MapDecorationRenderState> decors, ItemStack map) {
+        //? <26.3 {
+        /*//~ if <26.1 'MapRenderState.MapDecorationRenderState' -> 'MapDecoration'
         for (MapRenderState.MapDecorationRenderState decor : decors) {
             //? >=26.1
             Holder<MapDecorationType> type = ((MapDecorationRenderStateExtension) decor).mapstitch$getDecorationType();
             //~ if <26.1 'type' -> 'decor.type()'
-            if (isExplorationMarker(type)) return true;
+            if (type.value().explorationMapElement() || type.is(MapDecorationTypes.RED_X.unwrapKey().orElseThrow())) return true;
         }
         return false;
+        *///?} else {
+        return map.has(DataComponents.MAP_ID) && !map.is(ItemTags.EXTENDABLE_MAPS);
+        //?}
     }
 
     //~ if <26.1 'MapRenderState.MapDecorationRenderState' -> 'MapDecoration'
-    public static List<MapRenderState.MapDecorationRenderState> extractDecors(MapItemSavedData data, MapId id, Minecraft mc, boolean explorationOnly) {
-        //~ if <26.1 'MapRenderState.MapDecorationRenderState' -> 'MapDecoration'
-        List<MapRenderState.MapDecorationRenderState> decors = new ArrayList<>();
+    public static List<MapRenderState.MapDecorationRenderState> extractDecors(MapItemSavedData data, MapId id, Minecraft mc) {
         //? >=26.1 {
         MapRenderState state = new MapRenderState();
         mc.getMapRenderer().extractRenderState(id, data, state);
-        state.decorations.forEach(decor -> {
-            if (!explorationOnly) decors.add(decor);
-            else {
-                Holder<MapDecorationType> type = ((MapDecorationRenderStateExtension) decor).mapstitch$getDecorationType();
-                if (isExplorationMarker(type)) decors.add(decor);
-            }
-        });
+        return new ArrayList<>(state.decorations.stream()
+                .filter(decor ->
+                        !DECORS_REQUIRING_COMPASS.contains(
+                                ((MapDecorationRenderStateExtension) decor).mapstitch$getDecorationType()
+                        )
+                ).toList()
+        );
         //?} else {
-        /*data.getDecorations().forEach(decor -> {
-            if (!explorationOnly) decors.add(decor);
-            else if (isExplorationMarker(decor.type())) decors.add(decor);
+        /*List<MapDecoration> list = new ArrayList<>();
+        data.getDecorations().forEach(decor -> {
+            if (!DECORS_REQUIRING_COMPASS.contains(decor.type())) list.add(decor);
         });
+        return list;
         *///?}
-        return decors;
     }
 
     public static boolean hasCompass(Minecraft mc, String context) {

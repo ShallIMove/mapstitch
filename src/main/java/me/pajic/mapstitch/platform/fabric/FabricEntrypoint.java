@@ -14,6 +14,7 @@ import me.pajic.mapstitch.networking.payload.C2SPlaySound;
 import me.pajic.mapstitch.networking.payload.C2SSetEjectMode;
 import me.pajic.mapstitch.networking.payload.S2CDimensionIds;
 import me.pajic.mapstitch.networking.payload.S2COpenWorldMapScreen;
+import me.pajic.mapstitch.networking.payload.S2CPlaySound;
 import me.pajic.mapstitch.networking.payload.S2CSyncWorldMap;
 import me.pajic.mapstitch.recipe.ModRecipes;
 import me.pajic.mapstitch.util.CompatFlags;
@@ -56,6 +57,7 @@ public class FabricEntrypoint implements ModInitializer {
         PayloadTypeRegistry.clientboundPlay().register(S2CDimensionIds.TYPE, S2CDimensionIds.CODEC);
         PayloadTypeRegistry.clientboundPlay().register(S2COpenWorldMapScreen.TYPE, S2COpenWorldMapScreen.CODEC);
         PayloadTypeRegistry.clientboundPlay().register(S2CSyncWorldMap.TYPE, S2CSyncWorldMap.CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(S2CPlaySound.TYPE, S2CPlaySound.CODEC);
         PayloadTypeRegistry.serverboundPlay().register(C2SPlaySound.TYPE, C2SPlaySound.CODEC);
         PayloadTypeRegistry.serverboundPlay().register(C2SSetEjectMode.TYPE, C2SSetEjectMode.CODEC);
         PayloadTypeRegistry.serverboundPlay().register(C2SEjectMap.TYPE, C2SEjectMap.CODEC);

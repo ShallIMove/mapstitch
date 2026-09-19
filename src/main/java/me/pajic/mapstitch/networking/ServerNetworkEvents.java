@@ -10,22 +10,24 @@ import me.pajic.mapstitch.networking.payload.C2SPlaySound;
 import me.pajic.mapstitch.networking.payload.C2SSetEjectMode;
 import me.pajic.mapstitch.networking.payload.S2CSyncWorldMap;
 import me.pajic.mapstitch.platform.MultiLoaderUtil;
+import me.pajic.mapstitch.platform.MultiVersionUtil;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.BundleContents;
 import net.minecraft.world.level.saveddata.maps.MapId;
 
 import java.util.ArrayList;
 import java.util.List;
 
-//? >=26.1 {
+//? >=26.1
 import net.minecraft.world.item.ItemStackTemplate;
-//?}
+
+//? >26.2
+import net.minecraft.util.Prediction;
 
 public class ServerNetworkEvents {
 
@@ -59,7 +61,7 @@ public class ServerNetworkEvents {
                     //~ if <26.1 'ItemStackTemplate' -> 'ItemStack'
                     //~ if <26.1 'items().get(i)' -> 'getItemUnsafe(i)'
 					ItemStackTemplate map = contents.items().get(i);
-					if (map.is(Items.FILLED_MAP)) {
+					if (map.get(DataComponents.MAP_ID) != null) {
 						MapId mapId = map.get(DataComponents.MAP_ID);
 						if (mapId != null && mapId.equals(payload.mapId())) {
 							indexToRemove = i;
@@ -68,10 +70,12 @@ public class ServerNetworkEvents {
 					}
 				}
 				if (indexToRemove != -1) {
-					BundleContents.Mutable mutable = new BundleContents.Mutable(contents);
+					BundleContents.Mutable mutable = MultiVersionUtil.INSTANCE.toMutable(contents);
 					player.drop(
 							((BundleContentsMutableExtension) mutable).mapstitch$removeOneItemAtIndex(indexToRemove),
 							true
+                            //? >26.2
+                            , Prediction.SERVER_ONLY
 					);
 					player.playSound(SoundEvents.BUNDLE_REMOVE_ONE);
 					((AtlasItem) stack.getItem()).updateAtlas(mutable, stack, player);

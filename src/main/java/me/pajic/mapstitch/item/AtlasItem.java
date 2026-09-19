@@ -7,12 +7,16 @@ import me.pajic.mapstitch.enchantment.ModEnchantments;
 import me.pajic.mapstitch.extension.BundleContentsMutableExtension;
 import me.pajic.mapstitch.mixin.accessor.BundleItemAccessor;
 import me.pajic.mapstitch.networking.payload.S2COpenWorldMapScreen;
+import me.pajic.mapstitch.networking.payload.S2CPlaySound;
 import me.pajic.mapstitch.platform.MultiLoaderUtil;
+import me.pajic.mapstitch.platform.MultiVersionUtil;
 import me.pajic.mapstitch.util.ModUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.stats.Stats;
@@ -51,7 +55,6 @@ import java.util.UUID;
 import java.util.concurrent.Semaphore;
 
 //? >=26.1 {
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.ARGB;
 import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.BundleItem;
@@ -85,7 +88,7 @@ public class AtlasItem extends Item {
 		BundleContents initialContents = self.get(DataComponents.BUNDLE_CONTENTS);
 		if (initialContents != null) {
 			ItemStack other = slot.getItem();
-			BundleContents.Mutable contents = new BundleContents.Mutable(initialContents);
+			BundleContents.Mutable contents = MultiVersionUtil.INSTANCE.toMutable(initialContents);
             BundleContentsMutableExtension ext = (BundleContentsMutableExtension) contents;
             ext.mapstitch$setIsAtlas();
 			if (clickAction == ClickAction.PRIMARY && !other.isEmpty() && isValidItemForAtlas(other, self, player.level())) {
@@ -135,7 +138,7 @@ public class AtlasItem extends Item {
         //?}
 			BundleContents initialContents = self.get(DataComponents.BUNDLE_CONTENTS);
 			if (initialContents != null) {
-				BundleContents.Mutable contents = new BundleContents.Mutable(initialContents);
+				BundleContents.Mutable contents = MultiVersionUtil.INSTANCE.toMutable(initialContents);
                 BundleContentsMutableExtension ext = (BundleContentsMutableExtension) contents;
                 ext.mapstitch$setIsAtlas();
 				if (clickAction == ClickAction.PRIMARY && !other.isEmpty() && isValidItemForAtlas(other, self, player.level())) {
@@ -244,7 +247,7 @@ public class AtlasItem extends Item {
                     atlas.set(ModDataComponents.ATLAS_ACTIVE_MAP_ID, -1);
                     //~ if <26.1 'ItemStackTemplate' -> 'ItemStack'
                     for (ItemStackTemplate stack : contents.items()) {
-                        if (stack.is(Items.FILLED_MAP)) {
+                        if (stack.get(DataComponents.MAP_ID) != null) {
                             MapId mapId = stack.get(DataComponents.MAP_ID);
                             UUID uuid = owner.getUUID();
                             INITIALIZED.putIfAbsent(uuid, new HashSet<>());
@@ -262,7 +265,7 @@ public class AtlasItem extends Item {
                 int posZ = owner.getBlockZ();
                 //~ if <26.1 'ItemStackTemplate' -> 'ItemStack'
                 for (ItemStackTemplate stack : contents.items()) {
-                    if (stack.is(Items.FILLED_MAP)) {
+                    if (stack.get(DataComponents.MAP_ID) != null) {
                         MapId mapId = stack.get(DataComponents.MAP_ID);
                         UUID uuid = owner.getUUID();
                         INITIALIZED.putIfAbsent(uuid, new HashSet<>());
@@ -313,8 +316,15 @@ public class AtlasItem extends Item {
 		BundleContents contents = entity.getItem().get(DataComponents.BUNDLE_CONTENTS);
 		if (contents != null) {
 			entity.getItem().set(DataComponents.BUNDLE_CONTENTS, BundleContents.EMPTY);
-            //~ if <26.1 'itemCopyStream()' -> 'itemsCopy()'
-			ItemUtils.onContainerDestroyed(entity, contents.itemCopyStream());
+			ItemUtils.onContainerDestroyed(entity, contents.
+                    //? <26.1 {
+                    /*itemsCopy()
+                    *///?} >=26.1 <26.3 {
+                    /*itemCopyStream()
+                    *///?} else {
+                    itemCopies()
+                    //?}
+            );
 		}
 	}
 
@@ -333,7 +343,7 @@ public class AtlasItem extends Item {
 		for (ItemStackTemplate map : contents.items()) {
             //~ if <26.1 'count()' -> 'getCount()'
 			int count = map.count();
-			if (map.is(Items.FILLED_MAP)) filledMapCount += count;
+			if (map.get(DataComponents.MAP_ID) != null) filledMapCount += count;
 			if (map.is(Items.PAPER) || map.is(Items.MAP)) emptyMapCount += count;
 		}
 		lines.add(Component.translatable("mapstitch.tooltip.atlas.filled_maps", filledMapCount).withStyle(ChatFormatting.GRAY));
@@ -353,10 +363,10 @@ public class AtlasItem extends Item {
             //~ if <26.1 'ItemStackTemplate' -> 'ItemStack'
             //~ if <26.1 'items().get(i)' -> 'getItemUnsafe(i)'
 			ItemStackTemplate map = contents.items().get(i);
-			if (map.is(Items.FILLED_MAP)) {
+			if (map.get(DataComponents.MAP_ID) != null) {
 				MapId mapId = map.get(DataComponents.MAP_ID);
 				MapItemSavedData mapData = MapItem.getSavedData(mapId, level);
-				if (mapData != null && !ModUtil.isExplorationMap(mapData) && mapData.dimension.identifier().equals(level.dimension().identifier())) {
+				if (mapData != null && !ModUtil.isExplorationMap(map/*? >=26.1 {*/.create()/*?}*/, level) && mapData.dimension.identifier().equals(level.dimension().identifier())) {
 					int centerX = mapData.centerX;
 					int centerZ = mapData.centerZ;
 					cachedCenters.add(Pair.of(new Vector2i(centerX, centerZ), mapData.dimension.identifier()));
@@ -385,7 +395,7 @@ public class AtlasItem extends Item {
 					int centerZ = mapData.centerZ;
 					Vector2i center = new Vector2i(centerX, centerZ);
 					if (!cachedCenters.contains(Pair.of(center, mapData.dimension.identifier()))) {
-						BundleContents.Mutable mutableContents = new BundleContents.Mutable(contents);
+						BundleContents.Mutable mutableContents = MultiVersionUtil.INSTANCE.toMutable(contents);
                         BundleContentsMutableExtension ext = (BundleContentsMutableExtension) mutableContents;
                         ext.mapstitch$setIsAtlas();
                         ext.mapstitch$removeOneItemAtIndex(emptyMapIndex);
@@ -395,10 +405,13 @@ public class AtlasItem extends Item {
 						atlas.set(DataComponents.BUNDLE_CONTENTS, mutableContents.toImmutable());
 						if (owner instanceof ServerPlayer player) {
 							player.awardStat(Stats.ITEM_USED.get(this));
-							level.playSound(
-									null, player, SoundEvents.UI_CARTOGRAPHY_TABLE_TAKE_RESULT,
-									player.getSoundSource(), 1.0F, 1.0F
-							);
+                            if (level instanceof ServerLevel serverLevel) {
+                                serverLevel.players().forEach(pl ->
+                                        MultiLoaderUtil.INSTANCE.s2c(pl, new S2CPlaySound(
+                                                BuiltInRegistries.SOUND_EVENT.wrapAsHolder(SoundEvents.UI_CARTOGRAPHY_TABLE_TAKE_RESULT)
+                                        ))
+                                );
+                            }
                             updateAtlas(mutableContents, atlas, player);
 						}
 					}
@@ -433,10 +446,10 @@ public class AtlasItem extends Item {
 
 	private boolean isValidItemForAtlas(ItemStack stack, ItemStack atlas, Level level) {
 		if (ModEnchantments.hasGlobetrotter(atlas, level) ? stack.is(Items.PAPER) : stack.is(Items.MAP)) return true;
-		if (stack.is(Items.FILLED_MAP)) {
+		if (stack.has(DataComponents.MAP_ID)) {
 			MapItemSavedData mapData = MapItem.getSavedData(stack, level);
 			int atlasScale = atlas.getOrDefault(ModDataComponents.ATLAS_SCALE, -1);
-			return mapData != null && (ModUtil.isExplorationMap(mapData) || (atlasScale != -1 && mapData.scale == atlasScale));
+			return mapData != null && (ModUtil.isExplorationMap(stack, level) || (atlasScale != -1 && mapData.scale == atlasScale));
 		}
 		return false;
 	}

@@ -9,6 +9,7 @@ import me.pajic.mapstitch.minimap.MinimapOverlay;
 import me.pajic.mapstitch.networking.ClientNetworkEvents;
 import me.pajic.mapstitch.networking.payload.S2CDimensionIds;
 import me.pajic.mapstitch.networking.payload.S2COpenWorldMapScreen;
+import me.pajic.mapstitch.networking.payload.S2CPlaySound;
 import me.pajic.mapstitch.networking.payload.S2CSyncWorldMap;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -56,6 +57,9 @@ public class FabricClientEntrypoint implements ClientModInitializer {
         );
         ClientPlayNetworking.registerGlobalReceiver(S2CSyncWorldMap.TYPE, (payload, context) ->
                 ClientNetworkEvents.syncWorldMapScreen()
+        );
+        ClientPlayNetworking.registerGlobalReceiver(S2CPlaySound.TYPE, (payload, context) ->
+                ClientNetworkEvents.playSound(context.player(), payload.sound())
         );
         //? >=26.1 {
         HudElementRegistry.attachElementBefore(

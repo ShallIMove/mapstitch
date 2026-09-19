@@ -1,1 +1,3 @@
-- Fixed a bug that allowed regular bundles to store more items than they should.
+- Added Fabric 26.3 version.
+- Added option to disable the map writing sound when a map gets filled in the atlas.
+- Updated Russian translation ([#26](https://github.com/pajicadvance/mapstitch/pull/26)).

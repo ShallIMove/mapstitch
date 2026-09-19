@@ -23,7 +23,8 @@ public class EntityEquipmentMixin {
             method = "dropAll",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/world/entity/LivingEntity;drop(Lnet/minecraft/world/item/ItemStack;ZZ)Lnet/minecraft/world/entity/item/ItemEntity;"
+                    //~ if >26.2 'drop' -> 'createItemStackToDrop'
+                    target = "Lnet/minecraft/world/entity/LivingEntity;createItemStackToDrop(Lnet/minecraft/world/item/ItemStack;ZZ)Lnet/minecraft/world/entity/item/ItemEntity;"
             )
     )
     private ItemEntity preventAtlasDrop(LivingEntity instance, ItemStack stack, boolean randomly, boolean thrownFromHand, Operation<ItemEntity> original) {

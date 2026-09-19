@@ -4,14 +4,16 @@ import me.pajic.mapstitch.MapStitch;
 import me.pajic.mapstitch.enchantment.ModEnchantments;
 import me.pajic.mapstitch.extension.MapItemSavedDataExtension;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.level.saveddata.maps.MapDecoration;
-import net.minecraft.world.level.saveddata.maps.MapDecorationTypes;
+import net.minecraft.world.item.MapItem;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.maps.MapId;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
 import net.minecraft.world.level.storage.loot.BuiltInLootTables;
@@ -20,7 +22,16 @@ import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.entries.EmptyLootItem;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.functions.SetEnchantmentsFunction;
-import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
+
+//? <26.3 {
+/*import net.minecraft.world.level.saveddata.maps.MapDecoration;
+import net.minecraft.world.level.saveddata.maps.MapDecorationTypes;
+*///?} else {
+import net.minecraft.tags.ItemTags;
+//?}
+
+//~ if >26.2 'number.ConstantValue' -> 'number.ints.ContextIntProviders'
+import net.minecraft.world.level.storage.loot.providers.number.ints.ContextIntProviders;
 
 import java.util.List;
 
@@ -38,7 +49,8 @@ public class ModUtil {
                 .add(LootItem.lootTableItem(Items.BOOK).setWeight(MapStitch.CONFIG.globetrotter.chance.get())
                         .apply(new SetEnchantmentsFunction.Builder().withEnchantment(
                                 registry.lookupOrThrow(Registries.ENCHANTMENT).getOrThrow(ModEnchantments.GLOBETROTTER),
-                                ConstantValue.exactly(1))))
+                                //~ if >26.2 'ConstantValue' -> 'ContextIntProviders'
+                                ContextIntProviders.exactly(1))))
                 .add(EmptyLootItem.emptyItem().setWeight(100 - MapStitch.CONFIG.globetrotter.chance.get())) : LootPool.lootPool();
     }
 
@@ -49,16 +61,18 @@ public class ModUtil {
                 id.equals(ResourceKey.create(Registries.LOOT_TABLE, Identifier.withDefaultNamespace("chests/stronghold/library_bookshelf")).identifier());
     }
 
-    public static boolean isExplorationMap(MapItemSavedData data) {
-        for (MapDecoration decor : data.getDecorations()) {
-            if (isExplorationMarker(decor)) return true;
+    public static boolean isExplorationMap(ItemStack map, Level level) {
+        MapItemSavedData mapData = MapItem.getSavedData(map.get(DataComponents.MAP_ID), level);
+        if (mapData != null) {
+            //? <26.3 {
+            /*for (MapDecoration decor : mapData.getDecorations()) {
+                if (decor.type().value().explorationMapElement() ||
+                        decor.type().is(MapDecorationTypes.RED_X.unwrapKey().orElseThrow())) return true;
+            }
+            *///?} else {
+            return !map.is(ItemTags.EXTENDABLE_MAPS);
+            //?}
         }
         return false;
     }
-
-    // vanilla doesn't consider buried treasure maps to be explorer maps for some reason
-    public static boolean isExplorationMarker(MapDecoration decor) {
-        return decor.type().value().explorationMapElement() || decor.type().is(MapDecorationTypes.RED_X.unwrapKey().orElseThrow());
-    }
-
 }

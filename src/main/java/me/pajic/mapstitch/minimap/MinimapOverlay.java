@@ -17,7 +17,6 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.MapItem;
 import net.minecraft.world.item.component.BundleContents;
 import net.minecraft.world.level.biome.Biome;
@@ -226,16 +225,16 @@ public class MinimapOverlay {
         BundleContents contents = atlas.getOrDefault(DataComponents.BUNDLE_CONTENTS, BundleContents.EMPTY);
         //~ if <26.1 'ItemStackTemplate' -> 'ItemStack'
         for (ItemStackTemplate map : contents.items()) {
-            if (map.is(Items.FILLED_MAP)) {
-                MapId id = map.get(DataComponents.MAP_ID);
-                Vector2i mapCenter = map.get(ModDataComponents.MAP_CENTER);
-                if (id != null && mapCenter != null) {
-                    MapItemSavedData data = MC.level.getMapData(id);
-                    if (data != null) {
+            MapId id = map.get(DataComponents.MAP_ID);
+            Vector2i mapCenter = map.get(ModDataComponents.MAP_CENTER);
+            if (id != null && mapCenter != null) {
+                MapItemSavedData data = MC.level.getMapData(id);
+                if (data != null) {
+                    //~ if <26.1 'MapRenderState.MapDecorationRenderState' -> 'MapDecoration'
+                    List<MapRenderState.MapDecorationRenderState> decors = ModClientUtil.extractDecors(data, id, MC);
+                    if (ModClientUtil.isExplorationMap(decors, map/*? >=26.1 {*/.create()/*?}*/)) {
                         int scaleFactor = 1 << data.scale;
-                        //~ if <26.1 'MapRenderState.MapDecorationRenderState' -> 'MapDecoration'
-                        List<MapRenderState.MapDecorationRenderState> explorationDecors = ModClientUtil.extractDecors(data, id, MC, true);
-                        explorationDecors.forEach(decor -> {
+                        decors.forEach(decor -> {
                             int worldX = mapCenter.x + Math.round((decor.x/*? <26.1 {*//*()*//*?}*/ / 2.0F) * scaleFactor);
                             int worldZ = mapCenter.y + Math.round((decor.y/*? <26.1 {*//*()*//*?}*/ / 2.0F) * scaleFactor);
                             EXPLORATION_MARKERS.add(new MinimapExplorationMarker(worldX, worldZ, decor));
