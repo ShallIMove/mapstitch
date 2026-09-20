@@ -178,7 +178,7 @@
   "mapstitch.client_config.minimap.xOffset.desc": "Перемещает мини-карту по горизонтали.",
   "mapstitch.client_config.minimap.yOffset": "Смещение по вертикали",
   "mapstitch.client_config.minimap.yOffset.desc": "Перемещает мини-карту по вертикали.",
-  "mapstitch.client_config.minimap.preventEffectOverlap": "Предотвращать перекрытие эффектов",
+  "mapstitch.client_config.minimap.preventEffectOverlap": "Не перекрывать эффекты",
   "mapstitch.client_config.minimap.preventEffectOverlap.desc": "Перемещает мини-карту под интерфейс эффектов, когда она находится в правом верхнем углу, а у игрока есть активные эффекты, чтобы предотвратить перекрытие.",
   "mapstitch.client_config.worldMap": "Карта мира",
   "mapstitch.client_config.worldMap.textHighlightColor": "Цвет выделенного текста",
@@ -203,8 +203,8 @@
   "mapstitch.client_config.worldMap.textBackgroundOpacity.desc": "Управляет прозрачностью фона под текстом на карте мира.",
   "mapstitch.client_config.worldMap.buttons": "Показывать кнопки",
   "mapstitch.client_config.worldMap.buttons.desc": "Управляет отображением ряда кнопок справа.",
-  "mapstitch.client_config.worldMap.help": "Показывать переключатель подсказок",
-  "mapstitch.client_config.worldMap.help.desc": "Управляет отображением опции переключения подсказок.",
+  "mapstitch.client_config.worldMap.help": "Показывать подсказки",
+  "mapstitch.client_config.worldMap.help.desc": "Управляет отображением подсказок снизу слева.",
   "mapstitch.client_config.minimapInfo": "Информация мини-карты",
   "mapstitch.client_config.minimapInfo.desc": "Выберите, какую информацию показывать под мини-картой. Должно быть разрешено в основной конфигурации мода.",
   "mapstitch.client_config.minimapInfo.realTime": "Время",
@@ -215,4 +215,6 @@
   "mapstitch.client_config.minimapInfo.coordinates": "Координаты",
   "mapstitch.client_config.minimapInfo.biome": "Биомы",
   "mapstitch.client_config.minimapInfo.weather": "Погода"
+  "mapstitch.client_config.sounds": "Звуки",
+  "mapstitch.client_config.sounds.atlasMapCreation": "При создании карт в атласе"
 }
