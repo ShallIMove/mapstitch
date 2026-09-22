@@ -10,7 +10,7 @@ import me.pajic.mapstitch.networking.payload.C2SPlaySound;
 import me.pajic.mapstitch.networking.payload.C2SSetEjectMode;
 import me.pajic.mapstitch.networking.payload.S2CSyncWorldMap;
 import me.pajic.mapstitch.platform.MultiLoaderUtil;
-import me.pajic.mapstitch.platform.MultiVersionUtil;
+import me.pajic.mapstitch.util.ModUtil;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
@@ -70,7 +70,7 @@ public class ServerNetworkEvents {
 					}
 				}
 				if (indexToRemove != -1) {
-					BundleContents.Mutable mutable = MultiVersionUtil.INSTANCE.toMutable(contents);
+					BundleContents.Mutable mutable = ModUtil.toMutable(contents);
 					player.drop(
 							((BundleContentsMutableExtension) mutable).mapstitch$removeOneItemAtIndex(indexToRemove),
 							true

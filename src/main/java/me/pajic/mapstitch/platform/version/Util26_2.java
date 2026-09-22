@@ -13,7 +13,6 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
-import net.minecraft.world.item.component.BundleContents;
 import net.minecraft.world.level.saveddata.maps.MapId;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
 import org.jetbrains.annotations.Nullable;
@@ -96,11 +95,6 @@ public class Util26_2 implements MultiVersionUtil {
                     spr.getV1(), spr.getV0()
             );
         }
-    }
-
-    @Override
-    public BundleContents.Mutable toMutable(BundleContents contents) {
-        return new BundleContents.Mutable(contents);
     }
 }
 *///?}

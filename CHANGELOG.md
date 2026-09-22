@@ -1,3 +1,1 @@
-- Added Fabric 26.3 version.
-- Added option to disable the map writing sound when a map gets filled in the atlas.
-- Updated Russian translation ([#26](https://github.com/pajicadvance/mapstitch/pull/26)).
+- Fixed a dedicated server crash introduced in 1.1.5.

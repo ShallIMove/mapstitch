@@ -9,7 +9,6 @@ import me.pajic.mapstitch.mixin.accessor.BundleItemAccessor;
 import me.pajic.mapstitch.networking.payload.S2COpenWorldMapScreen;
 import me.pajic.mapstitch.networking.payload.S2CPlaySound;
 import me.pajic.mapstitch.platform.MultiLoaderUtil;
-import me.pajic.mapstitch.platform.MultiVersionUtil;
 import me.pajic.mapstitch.util.ModUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.component.DataComponents;
@@ -88,7 +87,7 @@ public class AtlasItem extends Item {
 		BundleContents initialContents = self.get(DataComponents.BUNDLE_CONTENTS);
 		if (initialContents != null) {
 			ItemStack other = slot.getItem();
-			BundleContents.Mutable contents = MultiVersionUtil.INSTANCE.toMutable(initialContents);
+			BundleContents.Mutable contents = ModUtil.toMutable(initialContents);
             BundleContentsMutableExtension ext = (BundleContentsMutableExtension) contents;
             ext.mapstitch$setIsAtlas();
 			if (clickAction == ClickAction.PRIMARY && !other.isEmpty() && isValidItemForAtlas(other, self, player.level())) {
@@ -138,7 +137,7 @@ public class AtlasItem extends Item {
         //?}
 			BundleContents initialContents = self.get(DataComponents.BUNDLE_CONTENTS);
 			if (initialContents != null) {
-				BundleContents.Mutable contents = MultiVersionUtil.INSTANCE.toMutable(initialContents);
+				BundleContents.Mutable contents = ModUtil.toMutable(initialContents);
                 BundleContentsMutableExtension ext = (BundleContentsMutableExtension) contents;
                 ext.mapstitch$setIsAtlas();
 				if (clickAction == ClickAction.PRIMARY && !other.isEmpty() && isValidItemForAtlas(other, self, player.level())) {
@@ -395,7 +394,7 @@ public class AtlasItem extends Item {
 					int centerZ = mapData.centerZ;
 					Vector2i center = new Vector2i(centerX, centerZ);
 					if (!cachedCenters.contains(Pair.of(center, mapData.dimension.identifier()))) {
-						BundleContents.Mutable mutableContents = MultiVersionUtil.INSTANCE.toMutable(contents);
+						BundleContents.Mutable mutableContents = ModUtil.toMutable(contents);
                         BundleContentsMutableExtension ext = (BundleContentsMutableExtension) mutableContents;
                         ext.mapstitch$setIsAtlas();
                         ext.mapstitch$removeOneItemAtIndex(emptyMapIndex);

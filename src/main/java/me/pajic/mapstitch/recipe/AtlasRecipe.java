@@ -2,7 +2,7 @@ package me.pajic.mapstitch.recipe;
 
 import me.pajic.mapstitch.component.ModDataComponents;
 import me.pajic.mapstitch.item.ModItems;
-import me.pajic.mapstitch.platform.MultiVersionUtil;
+import me.pajic.mapstitch.util.ModUtil;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -78,7 +78,7 @@ public class AtlasRecipe extends CustomRecipe {
 			itemStack = new ItemStack(ModItems.ATLAS);
 			itemStack.set(ModDataComponents.ATLAS_SCALE, scale);
 			itemStack.set(ModDataComponents.ATLAS_FULLNESS, 1);
-			BundleContents.Mutable contents = MultiVersionUtil.INSTANCE.toMutable(
+			BundleContents.Mutable contents = ModUtil.toMutable(
                     itemStack.getOrDefault(DataComponents.BUNDLE_CONTENTS, BundleContents.EMPTY)
             );
 			contents.tryInsert(map);

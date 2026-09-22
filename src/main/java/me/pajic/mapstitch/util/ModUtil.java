@@ -13,6 +13,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.MapItem;
+import net.minecraft.world.item.component.BundleContents;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.maps.MapId;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
@@ -74,5 +75,13 @@ public class ModUtil {
             //?}
         }
         return false;
+    }
+
+    public static BundleContents.Mutable toMutable(BundleContents contents) {
+        //? <26.3 {
+        /*return new BundleContents.Mutable(contents);
+        *///?} else {
+        return contents.asMutable();
+        //?}
     }
 }
