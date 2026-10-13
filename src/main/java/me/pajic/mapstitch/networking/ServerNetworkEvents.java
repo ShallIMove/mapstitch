@@ -10,8 +10,10 @@ import me.pajic.mapstitch.networking.payload.C2SPlacePin;
 import me.pajic.mapstitch.networking.payload.C2SPlaySound;
 import me.pajic.mapstitch.networking.payload.C2SRemovePin;
 import me.pajic.mapstitch.networking.payload.C2SSetEjectMode;
+import me.pajic.mapstitch.networking.payload.C2SSharePin;
 import me.pajic.mapstitch.networking.payload.S2CSyncWorldMap;
 import me.pajic.mapstitch.pin.Pin;
+import me.pajic.mapstitch.pin.PinShares;
 import me.pajic.mapstitch.pin.PinStorage;
 import me.pajic.mapstitch.pin.PinUtil;
 import me.pajic.mapstitch.platform.MultiLoaderUtil;
@@ -117,5 +119,9 @@ public class ServerNetworkEvents {
             PinUtil.givePin(serverPlayer, removed.color());
             PinStorage.sync(serverPlayer);
         }
+    }
+
+    public static void sharePin(C2SSharePin payload, Player player) {
+        if (player instanceof ServerPlayer serverPlayer) PinShares.share(serverPlayer, payload.pinId(), payload.target());
     }
 }

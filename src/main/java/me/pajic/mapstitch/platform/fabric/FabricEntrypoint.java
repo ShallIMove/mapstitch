@@ -14,16 +14,21 @@ import me.pajic.mapstitch.networking.payload.C2SPlacePin;
 import me.pajic.mapstitch.networking.payload.C2SPlaySound;
 import me.pajic.mapstitch.networking.payload.C2SRemovePin;
 import me.pajic.mapstitch.networking.payload.C2SSetEjectMode;
+import me.pajic.mapstitch.networking.payload.C2SSharePin;
 import me.pajic.mapstitch.networking.payload.S2CDimensionIds;
 import me.pajic.mapstitch.networking.payload.S2COpenWorldMapScreen;
 import me.pajic.mapstitch.networking.payload.S2CPlaySound;
 import me.pajic.mapstitch.networking.payload.S2CSyncPins;
 import me.pajic.mapstitch.networking.payload.S2CSyncWorldMap;
+import me.pajic.mapstitch.pin.PinShares;
 import me.pajic.mapstitch.recipe.ModRecipes;
 import me.pajic.mapstitch.util.CompatFlags;
 import me.pajic.mapstitch.util.ModUtil;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.creativetab.v1.CreativeModeTabEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.loot.v3.LootTableEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -69,6 +74,7 @@ public class FabricEntrypoint implements ModInitializer {
         PayloadTypeRegistry.serverboundPlay().register(C2SEjectMap.TYPE, C2SEjectMap.CODEC);
         PayloadTypeRegistry.serverboundPlay().register(C2SPlacePin.TYPE, C2SPlacePin.CODEC);
         PayloadTypeRegistry.serverboundPlay().register(C2SRemovePin.TYPE, C2SRemovePin.CODEC);
+        PayloadTypeRegistry.serverboundPlay().register(C2SSharePin.TYPE, C2SSharePin.CODEC);
         ServerPlayNetworking.registerGlobalReceiver(C2SPlaySound.TYPE, (payload, context) ->
                 ServerNetworkEvents.playSound(payload, context.player())
         );
@@ -84,6 +90,14 @@ public class FabricEntrypoint implements ModInitializer {
         ServerPlayNetworking.registerGlobalReceiver(C2SRemovePin.TYPE, (payload, context) ->
                 ServerNetworkEvents.removePin(payload, context.player())
         );
+        ServerPlayNetworking.registerGlobalReceiver(C2SSharePin.TYPE, (payload, context) ->
+                ServerNetworkEvents.sharePin(payload, context.player())
+        );
+        CommandRegistrationCallback.EVENT.register((dispatcher, r, e) ->
+                PinShares.registerCommands(dispatcher)
+        );
+        ServerTickEvents.END_SERVER_TICK.register(PinShares::tick);
+        ServerLifecycleEvents.SERVER_STOPPING.register(PinShares::onServerStopping);
         CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.TOOLS_AND_UTILITIES).register(output -> {
             //~ if <26.1 'insertAfter' -> 'addAfter'
             output.insertAfter(Items.MAP, ModItems.ATLAS_PIN.getDefaultInstance());
@@ -94,7 +108,7 @@ public class FabricEntrypoint implements ModInitializer {
                 output.insertAfter(Items.MAP, atlas);
             }
         });
-        LootTableEvents.MODIFY.register((key, tableBuilder, source, registries) -> {
+        LootTableEvents.MODIFY.register((key, tableBuilder, s, registries) -> {
             if (ModUtil.isGlobetrotterLootTable(key)) tableBuilder.withPool(ModUtil.getGlobetrotterLootPool(registries));
         });
         FabricLoader.getInstance().getModContainer(MapStitch.MOD_ID).ifPresent(container ->

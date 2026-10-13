@@ -7,18 +7,19 @@ import me.pajic.mapstitch.compat.OhmegaCompat;
 import me.pajic.mapstitch.component.ModDataComponents;
 import me.pajic.mapstitch.datapack.ModDatapacks;
 import me.pajic.mapstitch.item.ModItems;
-import me.pajic.mapstitch.networking.ClientNetworkEvents;
 import me.pajic.mapstitch.networking.ServerNetworkEvents;
 import me.pajic.mapstitch.networking.payload.C2SEjectMap;
 import me.pajic.mapstitch.networking.payload.C2SPlacePin;
 import me.pajic.mapstitch.networking.payload.C2SPlaySound;
 import me.pajic.mapstitch.networking.payload.C2SRemovePin;
 import me.pajic.mapstitch.networking.payload.C2SSetEjectMode;
+import me.pajic.mapstitch.networking.payload.C2SSharePin;
 import me.pajic.mapstitch.networking.payload.S2CDimensionIds;
 import me.pajic.mapstitch.networking.payload.S2COpenWorldMapScreen;
 import me.pajic.mapstitch.networking.payload.S2CPlaySound;
 import me.pajic.mapstitch.networking.payload.S2CSyncPins;
 import me.pajic.mapstitch.networking.payload.S2CSyncWorldMap;
+import me.pajic.mapstitch.pin.PinShares;
 import me.pajic.mapstitch.recipe.ModRecipes;
 import me.pajic.mapstitch.util.CompatFlags;
 import me.pajic.mapstitch.util.ModUtil;
@@ -35,9 +36,13 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.AddPackFindersEvent;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.event.LootTableLoadEvent;
+import net.neoforged.neoforge.event.RegisterCommandsEvent;
+import net.neoforged.neoforge.event.server.ServerStoppingEvent;
+import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import net.neoforged.neoforge.registries.RegisterEvent;
@@ -52,6 +57,9 @@ public class NeoforgeEntrypoint {
 
     public NeoforgeEntrypoint(IEventBus modBus) {
         if (CompatFlags.OHMEGA_LOADED) OhmegaCompat.setupAccessories(modBus);
+        NeoForge.EVENT_BUS.addListener((RegisterCommandsEvent e) -> PinShares.registerCommands(e.getDispatcher()));
+        NeoForge.EVENT_BUS.addListener((ServerTickEvent.Post e) -> PinShares.tick(e.getServer()));
+        NeoForge.EVENT_BUS.addListener((ServerStoppingEvent e) -> PinShares.onServerStopping(e.getServer()));
     }
 
     @SubscribeEvent
@@ -105,6 +113,9 @@ public class NeoforgeEntrypoint {
         );
         registrar.playToServer(C2SRemovePin.TYPE, C2SRemovePin.CODEC, (payload, context) ->
                 ServerNetworkEvents.removePin(payload, context.player())
+        );
+        registrar.playToServer(C2SSharePin.TYPE, C2SSharePin.CODEC, (payload, context) ->
+                ServerNetworkEvents.sharePin(payload, context.player())
         );
     }
 

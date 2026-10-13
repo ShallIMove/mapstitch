@@ -22,6 +22,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.server.IntegratedServer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
@@ -102,6 +103,7 @@ public class WorldMapScreen extends Screen {
     private Pin hoveredPin;
     private boolean pinPressActive;
     private double pinPressX, pinPressY, pinDragDistance;
+    private @Nullable Pin pressedPin;
 
     @SuppressWarnings("DataFlowIssue")
 	public WorldMapScreen(int scaleOverride) {
@@ -498,10 +500,15 @@ public class WorldMapScreen extends Screen {
 
     private void renderPinLabel(GuiGraphicsExtractor graphics, Pin pin, int sx, int sy) {
         List<Component> lines = new ArrayList<>();
-        lines.add(pin.name().isEmpty()
-                ? Component.translatable("mapstitch.gui.worldmap.pin.unnamed")
-                : Component.literal(pin.name()));
-        if (pinMode) lines.add(Component.translatable("mapstitch.gui.worldmap.pin.remove_hint").withColor(0xFFAAAAAA));
+        lines.add(pin.name().isEmpty() ?
+                Component.translatable("mapstitch.gui.worldmap.pin.unnamed") :
+                Component.literal(pin.name())
+        );
+        if (pinMode) {
+            lines.add(Component.translatable("mapstitch.gui.worldmap.pin.remove_hint").withColor(0xFFAAAAAA));
+        } else if (canSharePins()) {
+            lines.add(Component.translatable("mapstitch.gui.worldmap.pin.share_hint").withColor(0xFFAAAAAA));
+        }
         int w = lines.stream().mapToInt(font::width).max().orElse(0);
         int h = lines.size() * 10;
         int x = Mth.clamp(sx - w / 2, 2, screenW - w - 2);
@@ -528,6 +535,11 @@ public class WorldMapScreen extends Screen {
         int wz = Mth.floor(screenToWorldZ(sy));
         //~ if <26.1 'setScreenAndShow' -> 'setScreen'
         MC.setScreenAndShow(new PinPlacementScreen(this, dimensionId, wx, wz, coordinatesAllowed));
+    }
+
+    private void openPinShare(Pin pin) {
+        //~ if <26.1 'setScreenAndShow' -> 'setScreen'
+        MC.setScreenAndShow(new PinShareScreen(this, pin));
     }
 
 	private void renderPlayerMarker(GuiGraphicsExtractor graphics) {
@@ -773,6 +785,11 @@ public class WorldMapScreen extends Screen {
         EXPLORATION_MARKERS.clear();
     }
 
+    public static boolean canSharePins() {
+        IntegratedServer server = Minecraft.getInstance().getSingleplayerServer();
+        return server == null || server.isPublished();
+    }
+
 	@Override
     //~ if <26.1 '@NotNull MouseButtonEvent event' -> 'double mouseX, double mouseY, int button'
 	public boolean mouseDragged(@NotNull MouseButtonEvent event, double dx, double dy) {
@@ -797,8 +814,9 @@ public class WorldMapScreen extends Screen {
         boolean handled = super.mouseClicked(event, doubleClick);
         //~ if <26.1 'event.button()' -> 'button'
         //~ if >26.2 '0' -> '1'
-        pinPressActive = !handled && pinMode && event.button() == 1;
+        pinPressActive = !handled && event.button() == 1 && (pinMode || (hoveredPin != null && canSharePins()));
         if (pinPressActive) {
+            pressedPin = hoveredPin;
             //~ if <26.1 'event.x()' -> 'mouseX'
             pinPressX = event.x();
             //~ if <26.1 'event.y()' -> 'mouseY'
@@ -815,9 +833,12 @@ public class WorldMapScreen extends Screen {
         //~ if >26.2 '0' -> '1'
         if (pinPressActive && event.button() == 1) {
             pinPressActive = false;
-            //~ if <26.1 'event.hasControlDown()' -> 'hasControlDown()'
-            if (event.hasControlDown()) removeHoveredPin();
-            else openPinPlacement(pinPressX, pinPressY);
+            if (pinMode) {
+                //~ if <26.1 'event.hasControlDown()' -> 'hasControlDown()'
+                if (event.hasControlDown()) removeHoveredPin();
+                else openPinPlacement(pinPressX, pinPressY);
+            } else if (pressedPin != null && canSharePins()) openPinShare(pressedPin);
+            pressedPin = null;
             return true;
         }
         //~ if <26.1 'event' -> 'mouseX, mouseY, button'
