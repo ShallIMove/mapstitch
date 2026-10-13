@@ -21,6 +21,7 @@ import me.pajic.mapstitch.nethermap.NetherMapMode;
 import me.pajic.mapstitch.util.ModUtil;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
+import net.minecraft.world.level.storage.loot.BuiltInLootTables;
 
 import java.util.List;
 
@@ -42,6 +43,7 @@ public class ModConfig extends Config {
 	}
 
     public ValidatedInt maxAtlasItems = new ValidatedInt(16384, 16384, 1, ValidatedNumber.WidgetType.TEXTBOX);
+    public ValidatedBoolean atlasPin = new ValidatedBoolean();
     public ItemRequirements itemRequirements = new ItemRequirements();
     public MapRecipe mapRecipe = new MapRecipe();
     public NetherMap netherMap = new NetherMap();
@@ -79,6 +81,11 @@ public class ModConfig extends Config {
     public static class Globetrotter extends ConfigSection {
         public ValidatedBoolean enabled = new ValidatedBoolean();
         public ValidatedInt chance = new ValidatedInt(50, 100, 0);
+        public ValidatedSet<Identifier> lootTables = new ValidatedIdentifier().toSet(
+                BuiltInLootTables.STRONGHOLD_LIBRARY.identifier(),
+                Identifier.withDefaultNamespace("chests/stronghold/library_bookshelf"),
+                Identifier.parse("enderscape:stronghold/chest/library")
+        );
     }
 
     @RequiresAction(action = Action.RESTART)

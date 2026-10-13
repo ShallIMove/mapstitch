@@ -2,6 +2,8 @@ package me.pajic.mapstitch.networking;
 
 import me.pajic.mapstitch.MapStitchClient;
 import me.pajic.mapstitch.networking.payload.S2CDimensionIds;
+import me.pajic.mapstitch.networking.payload.S2CSyncPins;
+import me.pajic.mapstitch.pin.ClientPins;
 import me.pajic.mapstitch.worldmap.WorldMapScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.Holder;
@@ -32,5 +34,9 @@ public class ClientNetworkEvents {
             if (MapStitchClient.CONFIG.sounds.atlasMapCreation.get()) player.playSound(sound.value());
         }
         else player.playSound(sound.value());
+    }
+
+    public static void syncPins(S2CSyncPins payload) {
+        ClientPins.set(payload.pins());
     }
 }

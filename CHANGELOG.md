@@ -1,1 +1,15 @@
-- Fixed broken Russian translation.
+- Added a location pin system to the world map:
+  - New Atlas Pin item:
+    - Craft 16 atlas pins by combining paper, any wooden planks, and an iron ingot.
+    - Atlas pins can be dyed in bulk by combining 2-8 identical atlas pins with one or more dyes, with the default color being white.
+    - Atlas pins can be carried inside your inventory, bundles, or shulker boxes to be used in the world map screen.
+    - In the world map screen, press P to turn on pin placement mode. During pin placement mode:
+      - Click anywhere on the world map to open the pin placement menu.
+      - In the menu, set the pin name and select the pin color from the palette.
+      - Press the "Confirm" button to place the pin on the clicked location, consuming the atlas pin of the matching color.
+      - Click on an existing pin while holding Ctrl to remove the pin under the cursor, placing it back into your inventory.
+      - Press P again to turn off pin placement mode.
+- Added config option "Globetrotter" → "Loot locations", which allows specifying loot tables where Globetrotter can be found, with defaults being:
+  - Vanilla stronghold library chest
+  - Enderscape stronghold library chest
+  - Dungeons and Taverns stronghold overhaul library chest

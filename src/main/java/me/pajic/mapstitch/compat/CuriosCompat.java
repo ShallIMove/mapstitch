@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Optional;
 
 //? >=26.1
-//import net.minecraft.world.item.ItemStackTemplate;
+import net.minecraft.world.item.ItemStackTemplate;
 
 public class CuriosCompat implements AccessoryUtil {
 
@@ -44,7 +44,7 @@ public class CuriosCompat implements AccessoryUtil {
             if (handler.isEquipped(item)) return true;
             return handler.findCurios(stack -> stack.has(DataComponents.CONTAINER)).stream().anyMatch(slotResult -> {
                 //~ if <26.1 'ItemStackTemplate' -> 'ItemStack'
-                for (ItemStack stack : slotResult.stack().getOrDefault(DataComponents.CONTAINER, ItemContainerContents.EMPTY).nonEmptyItems()) {
+                for (ItemStackTemplate stack : slotResult.stack().getOrDefault(DataComponents.CONTAINER, ItemContainerContents.EMPTY).nonEmptyItems()) {
                     if (stack.is(item)) return true;
                 }
                 return false;

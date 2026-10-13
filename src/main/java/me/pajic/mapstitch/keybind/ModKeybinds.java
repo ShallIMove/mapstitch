@@ -37,8 +37,9 @@ public class ModKeybinds {
 	public static final KeyMapping TOGGLE_GRID = create(InputConstants.KEY_G, "toggle_grid", KEYS_WORLD_MAP_ID);
 	public static final KeyMapping EJECT_MAP = create(InputConstants.KEY_Q, "eject_map", KEYS_WORLD_MAP_ID);
 	public static final KeyMapping TOGGLE_HELP = create(InputConstants.KEY_H, "toggle_help", KEYS_WORLD_MAP_ID);
+    public static final KeyMapping TOGGLE_PIN_MODE = create(InputConstants.KEY_P, "toggle_pin_mode", KEYS_WORLD_MAP_ID);
 
-	public static void onClientTick(Minecraft client) {
+    public static void onClientTick(Minecraft client) {
 		if (client.player != null && client.level != null) {
             if (OPEN_WORLD_MAP.consumeClick()) {
                 client.player.playSound(SoundEvents.BOOK_PAGE_TURN);

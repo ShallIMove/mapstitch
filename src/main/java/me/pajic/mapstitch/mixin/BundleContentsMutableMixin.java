@@ -55,15 +55,13 @@ public abstract class BundleContentsMutableMixin implements BundleContentsMutabl
 
     @Override
     public ItemStack mapstitch$removeOneItemAtIndex(int index) {
-        if (!mapstitch$items().isEmpty()) {
-            ItemStack stack = mapstitch$items().get(index).copy();
-            ItemStack removed = stack.split(1);
-            weight = weight.subtract(BundleContentsAccessor.getWeight(stack).getOrThrow().multiplyBy(Fraction.getFraction(stack.getCount(), 1)));
-            if (stack.isEmpty()) mapstitch$items().remove(index);
-            else mapstitch$items().set(index, stack);
-            return removed;
-        }
-        return ItemStack.EMPTY;
+        if (mapstitch$items().isEmpty() || index < 0 || index >= mapstitch$items().size()) return ItemStack.EMPTY;
+        ItemStack stack = mapstitch$items().get(index).copy();
+        ItemStack removed = stack.split(1);
+        weight = weight.subtract(BundleContentsAccessor.getWeight(removed)/*? >=26.1 {*/.getOrThrow()/*?}*/);
+        if (stack.isEmpty()) mapstitch$items().remove(index);
+        else mapstitch$items().set(index, stack);
+        return removed;
     }
 
     @Override

@@ -16,18 +16,21 @@ import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 
 //? >=26.1 {
-/^import net.minecraft.client.KeyMapping;
+import net.minecraft.client.KeyMapping;
 import net.neoforged.neoforge.client.network.event.RegisterClientPayloadHandlersEvent;
 import me.pajic.mapstitch.networking.ClientNetworkEvents;
 import me.pajic.mapstitch.networking.payload.S2CDimensionIds;
 import me.pajic.mapstitch.networking.payload.S2COpenWorldMapScreen;
 import me.pajic.mapstitch.networking.payload.S2CPlaySound;
+import me.pajic.mapstitch.networking.payload.S2CSyncPins;
 import me.pajic.mapstitch.networking.payload.S2CSyncWorldMap;
-^///?} else {
-import me.pajic.mapstitch.component.ModDataComponents;
+//?} else {
+/^import me.pajic.mapstitch.component.ModDataComponents;
 import me.pajic.mapstitch.item.ModItems;
+import me.pajic.mapstitch.pin.PinUtil;
 import net.minecraft.client.renderer.item.ItemProperties;
-//?}
+import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
+^///?}
 
 @EventBusSubscriber(modid = MapStitch.MOD_ID, value = Dist.CLIENT)
 public class NeoforgeClientEventSubscriber {
@@ -36,20 +39,20 @@ public class NeoforgeClientEventSubscriber {
 	public static void onClientSetup(final FMLCommonSetupEvent event) {
         MapStitch.onInitializeClient();
         //? <26.1 {
-        ItemProperties.register(
+        /^ItemProperties.register(
                 ModItems.ATLAS,
                 MapStitch.id("atlas_fullness"),
                 (stack, level, entity, i) -> stack.getOrDefault(ModDataComponents.ATLAS_FULLNESS, 0)
         );
-        //?}
+        ^///?}
 	}
 
     @SubscribeEvent
     private static void initKeybinds(RegisterKeyMappingsEvent event) {
         //? >=26.1 {
-        /^event.registerCategory(new KeyMapping.Category(ModKeybinds.KEYS_ID));
+        event.registerCategory(new KeyMapping.Category(ModKeybinds.KEYS_ID));
         event.registerCategory(new KeyMapping.Category(ModKeybinds.KEYS_WORLD_MAP_ID));
-        ^///?}
+        //?}
         event.register(ModKeybinds.OPEN_WORLD_MAP);
         event.register(ModKeybinds.TOGGLE_MINIMAP);
         event.register(ModKeybinds.SCALE_UP);
@@ -60,6 +63,7 @@ public class NeoforgeClientEventSubscriber {
         event.register(ModKeybinds.TOGGLE_GRID);
         event.register(ModKeybinds.EJECT_MAP);
         event.register(ModKeybinds.TOGGLE_HELP);
+        event.register(ModKeybinds.TOGGLE_PIN_MODE);
     }
 
     @SubscribeEvent
@@ -68,19 +72,30 @@ public class NeoforgeClientEventSubscriber {
     }
 
     //? >=26.1 {
-    /^@SubscribeEvent
+    @SubscribeEvent
     private static void initNetworking(RegisterClientPayloadHandlersEvent event) {
-        event.register(S2CDimensionIds.TYPE, (payload, context) ->
+        event.register(S2CDimensionIds.TYPE, (payload, c) ->
                 ClientNetworkEvents.setDimensionIds(payload)
         );
         event.register(S2COpenWorldMapScreen.TYPE, (payload, context) ->
                 ClientNetworkEvents.openWorldMapScreen(context.player(), payload.scaleOverride())
         );
-        event.register(S2CSyncWorldMap.TYPE, (payload, context) ->
+        event.register(S2CSyncWorldMap.TYPE, (p, c) ->
                 ClientNetworkEvents.syncWorldMapScreen()
         );
         event.register(S2CPlaySound.TYPE, (payload, context) ->
                 ClientNetworkEvents.playSound(context.player(), payload.sound())
+        );
+        event.register(S2CSyncPins.TYPE, (payload, c) ->
+                ClientNetworkEvents.syncPins(payload)
+        );
+    }
+    //?} else {
+    /^@SubscribeEvent
+    public static void initItemColors(RegisterColorHandlersEvent.Item event) {
+        event.register(
+                (stack, tintIndex) -> tintIndex == 0 ? 0xFF000000 | PinUtil.colorOf(stack) : PinUtil.DEFAULT_COLOR,
+                ModItems.ATLAS_PIN
         );
     }
     ^///?}

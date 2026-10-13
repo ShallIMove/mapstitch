@@ -14,8 +14,8 @@ import net.neoforged.neoforge.network.PacketDistributor;
 import java.nio.file.Path;
 
 //? >=26.1 {
-/^import net.neoforged.neoforge.client.network.ClientPacketDistributor;
-^///?}
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
+//?}
 
 public class NeoforgeLoaderUtil implements MultiLoaderUtil {
 
@@ -26,7 +26,7 @@ public class NeoforgeLoaderUtil implements MultiLoaderUtil {
 
     @Override
     public boolean isDevEnv() {
-        return !FMLLoader/^? >=1.21.9 {^//^.getCurrent()^//^?}^/.isProduction();
+        return !FMLLoader/^? >=1.21.9 {^/.getCurrent()/^?}^/.isProduction();
     }
 
     @Override
@@ -42,7 +42,7 @@ public class NeoforgeLoaderUtil implements MultiLoaderUtil {
     @Override
     public void c2s(CustomPacketPayload payload) {
         //~ if <26.1 'ClientPacketDistributor' -> 'PacketDistributor'
-        PacketDistributor.sendToServer(payload);
+        ClientPacketDistributor.sendToServer(payload);
     }
 }
 *///?}

@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:crafting_dye",
+  "category": "misc",
+  "dye": "#minecraft:dyes",
+  "result": {
+    "id": "mapstitch:atlas_pin"
+  },
+  "target": "mapstitch:atlas_pin"
+}

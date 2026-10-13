@@ -9,6 +9,9 @@ import me.pajic.mapstitch.component.ModDataComponents;
 import me.pajic.mapstitch.item.ModItems;
 import me.pajic.mapstitch.keybind.ModKeybinds;
 import me.pajic.mapstitch.networking.payload.C2SEjectMap;
+import me.pajic.mapstitch.networking.payload.C2SRemovePin;
+import me.pajic.mapstitch.pin.ClientPins;
+import me.pajic.mapstitch.pin.Pin;
 import me.pajic.mapstitch.platform.MultiLoaderUtil;
 import me.pajic.mapstitch.platform.MultiVersionUtil;
 import me.pajic.mapstitch.util.ModClientUtil;
@@ -89,7 +92,13 @@ public class WorldMapScreen extends Screen {
 	private boolean follow;
 	private int mapsRendered = 0;
 
-	@SuppressWarnings("DataFlowIssue")
+    private boolean pinMode;
+    private boolean mapSourcesPresent;
+    private Pin hoveredPin;
+    private boolean pinPressActive;
+    private double pinPressX, pinPressY, pinDragDistance;
+
+    @SuppressWarnings("DataFlowIssue")
 	public WorldMapScreen(int scaleOverride) {
 		super(Component.translatable("mapstitch.gui.worldmap.title"));
 		WorldMapState state = WorldMapStateHolder.state();
@@ -168,6 +177,13 @@ public class WorldMapScreen extends Screen {
 			).pos(width - 20, height / 2 + 54).size(16, 16).tooltip(
 					Tooltip.create(Component.translatable("mapstitch.gui.worldmap.button.help.tooltip"))
 			).build());
+
+            if (MapStitch.CONFIG.atlasPin.get()) addRenderableWidget(Button.builder(
+                    Component.translatable("mapstitch.gui.worldmap.button.pin"),
+                    b -> pinMode = !pinMode
+            ).pos(width - 20, height / 2 + 72).size(16, 16).tooltip(
+                    Tooltip.create(Component.translatable("mapstitch.gui.worldmap.button.pin.tooltip"))
+            ).build());
 		}
 	}
 
@@ -204,6 +220,9 @@ public class WorldMapScreen extends Screen {
     public double screenToWorldX(double screenX) { return (screenX - screenW / 2.0) / zoom + camX; }
     public double screenToWorldZ(double screenY) { return (screenY - screenH / 2.0) / zoom + camZ; }
 
+    private int pinScreenX(Pin pin) { return (int) Math.round(worldToScreenX(pin.x() + 0.5)); }
+    private int pinScreenY(Pin pin) { return (int) Math.round(worldToScreenZ(pin.z() + 0.5)); }
+
 	@SuppressWarnings("DataFlowIssue")
 	@Override
     //~ if <26.1 'extractRenderState' -> 'render'
@@ -224,6 +243,7 @@ public class WorldMapScreen extends Screen {
             renderMaps(graphics, xBoundMin, xBoundMax, zBoundMin, zBoundMax);
             renderDecorations(graphics);
             renderExplorationMarkers(graphics);
+            renderPins(graphics);
             if (hasCompass && MC.level.dimension().identifier().equals(dimensionId)) renderPlayerMarker(graphics);
             if (gridAllowed && grid) {
                 renderGrid(graphics, xBoundMin, xBoundMax, zBoundMin, zBoundMax);
@@ -314,6 +334,7 @@ public class WorldMapScreen extends Screen {
             );
             MultiVersionUtil.INSTANCE.popPose(graphics);
 		}
+        mapSourcesPresent = hasAnyMapSources;
 	}
 
 	private void renderDecorations(GuiGraphicsExtractor graphics) {
@@ -424,6 +445,68 @@ public class WorldMapScreen extends Screen {
         });
     }
 
+    private void renderPins(GuiGraphicsExtractor graphics) {
+        hoveredPin = null;
+        if (!mapSourcesPresent) return;
+        List<Pin> visible = new ArrayList<>();
+        for (Pin pin : ClientPins.get()) {
+            if (!pin.dimension().equals(dimensionId)) continue;
+            int sx = pinScreenX(pin), sy = pinScreenY(pin);
+            if (sx < -4 || sx > screenW + 4 || sy < 0 || sy > screenH + 11) continue;
+            visible.add(pin);
+            if (mouseX >= sx - 3 && mouseX < sx + 4 && mouseY >= sy - 10 && mouseY <= sy) hoveredPin = pin;
+        }
+        for (Pin pin : visible) {
+            if (pin != hoveredPin) drawPin(graphics, pinScreenX(pin), pinScreenY(pin), pin.color(), false);
+        }
+        if (hoveredPin != null) {
+            int sx = pinScreenX(hoveredPin), sy = pinScreenY(hoveredPin);
+            drawPin(graphics, sx, sy, hoveredPin.color(), true);
+            renderPinLabel(graphics, hoveredPin, sx, sy);
+        }
+    }
+
+    private void drawPin(GuiGraphicsExtractor graphics, int sx, int sy, int color, boolean highlighted) {
+        graphics.fill(sx, sy - 4, sx + 1, sy + 1, 0xFF6B6B6B);
+        graphics.fill(sx - 3, sy - 10, sx + 4, sy - 3, highlighted ? 0xFFFFFFFF : 0xFF000000);
+        graphics.fill(sx - 2, sy - 9, sx + 3, sy - 4, 0xFF000000 | color);
+        graphics.fill(sx - 1, sy - 8, sx, sy - 7, 0x80FFFFFF);
+    }
+
+    private void renderPinLabel(GuiGraphicsExtractor graphics, Pin pin, int sx, int sy) {
+        List<Component> lines = new ArrayList<>();
+        lines.add(pin.name().isEmpty()
+                ? Component.translatable("mapstitch.gui.worldmap.pin.unnamed")
+                : Component.literal(pin.name()));
+        if (pinMode) lines.add(Component.translatable("mapstitch.gui.worldmap.pin.remove_hint").withColor(0xFFAAAAAA));
+        int w = lines.stream().mapToInt(font::width).max().orElse(0);
+        int h = lines.size() * 10;
+        int x = Mth.clamp(sx - w / 2, 2, screenW - w - 2);
+        int y = Math.max(2, sy - 13 - h);
+        graphics.fill(x - 2, y - 2, x + w + 2, y + h, MultiVersionUtil.INSTANCE.color(
+                MultiVersionUtil.INSTANCE.as8BitChannel(MapStitchClient.CONFIG.worldMap.textBackgroundOpacity.get() / 100F),
+                0, 0, 0
+        ));
+        for (int i = 0; i < lines.size(); i++) graphics.text(MC.font, lines.get(i), x, y + i * 10, -1);
+    }
+
+    @SuppressWarnings("DataFlowIssue")
+    private void removeHoveredPin() {
+        if (hoveredPin == null) return;
+        MultiLoaderUtil.INSTANCE.c2s(new C2SRemovePin(hoveredPin.id()));
+        MC.player.playSound(SoundEvents.BUNDLE_REMOVE_ONE);
+        hoveredPin = null;
+    }
+
+    private void openPinPlacement(double sx, double sy) {
+        if (!mapSourcesPresent) return;
+        if (gridAllowed && grid && (sy < 12 || sx < getVerticalGridBarWidth(MC.font))) return; // clicked on the grid bars
+        int wx = Mth.floor(screenToWorldX(sx));
+        int wz = Mth.floor(screenToWorldZ(sy));
+        //~ if <26.1 'setScreenAndShow' -> 'setScreen'
+        MC.setScreenAndShow(new PinPlacementScreen(this, dimensionId, wx, wz, coordinatesAllowed));
+    }
+
 	private void renderPlayerMarker(GuiGraphicsExtractor graphics) {
 		double sx = worldToScreenX(posX);
 		double sz = worldToScreenZ(posZ);
@@ -466,6 +549,7 @@ public class WorldMapScreen extends Screen {
 						"mapstitch.gui.worldmap.zoom",
 						white(zoom * Math.round(Math.pow(2, scale)) + "x")
 				).withColor(c), true),
+                new ObjectBooleanImmutablePair<>(Component.translatable("mapstitch.gui.worldmap.pin_mode").withColor(c), pinMode),
 				new ObjectBooleanImmutablePair<>(Component.translatable(
 						"mapstitch.gui.worldmap.following"
 				), follow),
@@ -515,6 +599,10 @@ public class WorldMapScreen extends Screen {
 						"mapstitch.gui.worldmap.center_control",
 						Component.translatable("mapstitch.gui.worldmap.center_key").withColor(c)
 				), help),
+                new ObjectBooleanImmutablePair<>(Component.translatable(
+                        "mapstitch.gui.worldmap.pin_control",
+                        Component.keybind(ModKeybinds.TOGGLE_PIN_MODE.getName()).withColor(c)
+                ), MapStitch.CONFIG.atlasPin.get() && help),
 				new ObjectBooleanImmutablePair<>(Component.translatable(
 						"mapstitch.gui.worldmap.zoom_control",
 						Component.translatable("mapstitch.gui.worldmap.zoom_key").withColor(c)
@@ -665,6 +753,8 @@ public class WorldMapScreen extends Screen {
 	@Override
     //~ if <26.1 '@NotNull MouseButtonEvent event' -> 'double mouseX, double mouseY, int button'
 	public boolean mouseDragged(@NotNull MouseButtonEvent event, double dx, double dy) {
+        pinDragDistance += Math.abs(dx) + Math.abs(dy);
+        if (pinDragDistance > 3) pinPressActive = false;
         //~ if <26.1 'event.button()' -> 'button'
         //~ if >26.2 '0' -> '1'
 		if (event.button() == 1) {
@@ -679,10 +769,37 @@ public class WorldMapScreen extends Screen {
     //~ if <26.1 'MouseButtonEvent event, boolean doubleClick' -> 'double mouseX, double mouseY, int button'
 	public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
         //~ if <26.1 'event.button()' -> 'button'
-		if (event.button() == 2) centerMap();
+        if (event.button() == 2) centerMap();
         //~ if <26.1 'event, doubleClick' -> 'mouseX, mouseY, button'
-		return super.mouseClicked(event, doubleClick);
+        boolean handled = super.mouseClicked(event, doubleClick);
+        //~ if <26.1 'event.button()' -> 'button'
+        //~ if >26.2 '0' -> '1'
+        pinPressActive = !handled && pinMode && event.button() == 1;
+        if (pinPressActive) {
+            //~ if <26.1 'event.x()' -> 'mouseX'
+            pinPressX = event.x();
+            //~ if <26.1 'event.y()' -> 'mouseY'
+            pinPressY = event.y();
+            pinDragDistance = 0;
+        }
+        return handled || pinPressActive;
 	}
+
+    @Override
+    //~ if <26.1 'MouseButtonEvent event' -> 'double mouseX, double mouseY, int button'
+    public boolean mouseReleased(@NotNull MouseButtonEvent event) {
+        //~ if <26.1 'event.button()' -> 'button'
+        //~ if >26.2 '0' -> '1'
+        if (pinPressActive && event.button() == 1) {
+            pinPressActive = false;
+            //~ if <26.1 'event.hasControlDown()' -> 'hasControlDown()'
+            if (event.hasControlDown()) removeHoveredPin();
+            else openPinPlacement(pinPressX, pinPressY);
+            return true;
+        }
+        //~ if <26.1 'event' -> 'mouseX, mouseY, button'
+        return super.mouseReleased(event);
+    }
 
 	@Override
 	public boolean mouseScrolled(double x, double y, double scrollX, double scrollY) {
@@ -732,6 +849,10 @@ public class WorldMapScreen extends Screen {
 			onClose();
 			return true;
 		}
+        if (MapStitch.CONFIG.atlasPin.get() && ModKeybinds.TOGGLE_PIN_MODE.matches(event)) {
+            pinMode = !pinMode;
+            return true;
+        }
         //~ if <26.1 'event.hasControlDown()' -> 'modifiers == 2'
 		if (event.hasControlDown() && ModKeybinds.EJECT_MAP.matches(event)) {
 			ejectMapAtCursor();

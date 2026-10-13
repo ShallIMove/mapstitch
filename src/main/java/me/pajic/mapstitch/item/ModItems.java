@@ -14,6 +14,9 @@ public class ModItems {
 	public static final ResourceKey<Item> ATLAS_KEY = ResourceKey.create(Registries.ITEM, MapStitch.id("atlas"));
 	public static final Item ATLAS = makeAtlas(createAtlasProperties());
 
+    public static final ResourceKey<Item> ATLAS_PIN_KEY = ResourceKey.create(Registries.ITEM, MapStitch.id("atlas_pin"));
+    public static final Item ATLAS_PIN = new AtlasPinItem();
+
 	private static Item.Properties createAtlasProperties() {
 		BundleContents contents = BundleContents.EMPTY;
 		return new Item.Properties()
@@ -21,7 +24,7 @@ public class ModItems {
 				.component(ModDataComponents.ATLAS_FULLNESS, 0)
 				.component(ModDataComponents.ATLAS_ACTIVE_MAP_ID, -1)
 				.component(ModDataComponents.ATLAS_EJECT_FILLED_MAPS_FIRST, true)
-				.stacksTo(1)/*? >=26.1 {*/.setId(ModItems.ATLAS_KEY)/*?}*/;
+				.stacksTo(1)/*? >=26.1 {*/.setId(ATLAS_KEY)/*?}*/;
 	}
 
 	private static AtlasItem makeAtlas(Item.Properties properties) {

@@ -24,6 +24,10 @@
   "mapstitch.gui.worldmap.zoom_key": "Scroll wheel",
   "mapstitch.gui.worldmap.eject_key": "Ctrl+%s",
   "mapstitch.gui.worldmap.exit_key": "Esc",
+  "mapstitch.gui.worldmap.pin_mode": "Pin placement mode",
+  "mapstitch.gui.worldmap.pin_control": "%s: Toggle pin placement mode (Click: place pin, Ctrl + Click: remove pin)",
+  "mapstitch.gui.worldmap.pin.unnamed": "Unnamed pin",
+  "mapstitch.gui.worldmap.pin.remove_hint": "Ctrl + Click to remove",
   "mapstitch.gui.minimap.coordinates": "%s %s %s",
   "mapstitch.gui.minimap.real_time": "%s",
   "mapstitch.gui.minimap.time": "Day %s %s:%s",
@@ -35,6 +39,15 @@
   "mapstitch.gui.minimap.weather.thundering": "Thunderstorm",
   "mapstitch.gui.minimap.no_map_1": "No map in atlas",
   "mapstitch.gui.minimap.no_map_2": "for this area",
+
+  "mapstitch.gui.pin.title": "Place Pin",
+  "mapstitch.gui.pin.location": "Location: %s, %s",
+  "mapstitch.gui.pin.name": "Pin name",
+  "mapstitch.gui.pin.color": "Color",
+  "mapstitch.gui.pin.color_info": "%s (%s available)",
+  "mapstitch.gui.pin.no_pins": "You don't have any atlas pins",
+  "mapstitch.gui.pin.confirm": "Confirm",
+  "mapstitch.gui.pin.cancel": "Cancel",
 
   "mapstitch.gui.worldmap.button.zoom_in": "+",
   "mapstitch.gui.worldmap.button.zoom_in.tooltip": "Zoom in",
@@ -52,6 +65,8 @@
   "mapstitch.gui.worldmap.button.follow.tooltip": "Toggle player following",
   "mapstitch.gui.worldmap.button.help": "H",
   "mapstitch.gui.worldmap.button.help.tooltip": "Toggle help",
+  "mapstitch.gui.worldmap.button.pin": "P",
+  "mapstitch.gui.worldmap.button.pin.tooltip": "Toggle pin placement mode",
 
   "mapstitch.gui.worldmap.no_map_sources": "No maps found",
   "mapstitch.gui.worldmap.no_map_sources_info": "Craft an Atlas and store maps inside of it",
@@ -74,6 +89,7 @@
   "mapstitch.pack.globetrotter": "Globetrotter Enchantment",
 
   "item.mapstitch.atlas": "Atlas",
+  "item.mapstitch.atlas_pin": "Atlas Pin",
 
   "enchantment.mapstitch.globetrotter": "Globetrotter",
   "enchantment.mapstitch.globetrotter.desc": "Makes the Atlas create maps using paper instead of using empty maps.",
@@ -95,6 +111,7 @@
   "mapstitch.key.toggle_grid": "Toggle grid",
   "mapstitch.key.eject_map": "Drop map under cursor",
   "mapstitch.key.toggle_help": "Toggle help",
+  "mapstitch.key.toggle_pin_mode": "Toggle pin placement mode",
 
   "trinkets.slot.mapstitch.atlas": "Atlas",
   "trinkets.slot.mapstitch.compass": "Compass",
@@ -103,6 +120,7 @@
 
   "mapstitch.config": "MapStitch Configuration",
   "mapstitch.config.maxAtlasItems": "Max items in atlas",
+  "mapstitch.config.atlasPin": "Atlas pins",
   "mapstitch.config.itemRequirements": "Item requirement settings",
   "mapstitch.config.itemRequirements.compass": "Require compass for...",
   "mapstitch.config.itemRequirements.clock": "Require clock for...",
@@ -129,6 +147,7 @@
   "mapstitch.config.globetrotter.enabled": "Enabled",
   "mapstitch.config.globetrotter.chance": "Loot chance",
   "mapstitch.config.globetrotter.chance.desc": "Percent chance for the enchanted book to appear in stronghold library chests.\nSet to something lower if using stronghold structure mods, unless you want way too many of these books for some reason.",
+  "mapstitch.config.globetrotter.lootTables": "Loot locations",
   "mapstitch.config.accessorySlots": "Accessory slot settings",
   "mapstitch.config.accessorySlots.desc": "Requires Trinkets/Curios/Ohmega",
   "mapstitch.config.accessorySlots.compassSlot": "Compass slot",

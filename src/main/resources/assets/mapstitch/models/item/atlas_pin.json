@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "mapstitch:item/atlas_pin",
+    "layer1": "mapstitch:item/atlas_pin_overlay"
+  }
+}

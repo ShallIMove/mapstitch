@@ -17,7 +17,6 @@ import net.minecraft.world.item.component.BundleContents;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.maps.MapId;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
-import net.minecraft.world.level.storage.loot.BuiltInLootTables;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.entries.EmptyLootItem;
@@ -56,10 +55,7 @@ public class ModUtil {
     }
 
     public static boolean isGlobetrotterLootTable(ResourceKey<LootTable> key) {
-        Identifier id = key.identifier();
-        return id.equals(BuiltInLootTables.STRONGHOLD_LIBRARY.identifier()) ||
-                // d&t stronghold overhaul library pool
-                id.equals(ResourceKey.create(Registries.LOOT_TABLE, Identifier.withDefaultNamespace("chests/stronghold/library_bookshelf")).identifier());
+        return MapStitch.CONFIG.globetrotter.lootTables.get().contains(key.identifier());
     }
 
     public static boolean isExplorationMap(ItemStack map, Level level) {

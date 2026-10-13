@@ -10,10 +10,10 @@ import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.capability.ICurioItem;
 
 //? <26.1 {
-import top.theillusivec4.curios.api.type.capability.ICurio;
-//?} else {
-/^import top.theillusivec4.curios.api.common.DropRule;
-^///?}
+/^import top.theillusivec4.curios.api.type.capability.ICurio;
+^///?} else {
+import top.theillusivec4.curios.api.common.DropRule;
+//?}
 
 public class AtlasCurioItem extends AtlasItem implements ICurioItem {
 
@@ -24,13 +24,13 @@ public class AtlasCurioItem extends AtlasItem implements ICurioItem {
     @Override
     public void curioTick(SlotContext slotContext, ItemStack stack) {
         //~ if <26.1 'null' -> '0, true'
-		stack.inventoryTick(slotContext.entity().level(), slotContext.entity(), 0, true);
+		stack.inventoryTick(slotContext.entity().level(), slotContext.entity(), null);
     }
 
     //~ if <26.1 ' DropRule' -> ' ICurio.DropRule' {
     @Override @NotNull
-    public ICurio.DropRule getDropRule(SlotContext slotContext, DamageSource source, boolean recentlyHit, ItemStack stack) {
-        return MapStitch.CONFIG.keepAtlasOnDeath.get() ? ICurio.DropRule.ALWAYS_KEEP : ICurio.DropRule.DEFAULT;
+    public DropRule getDropRule(SlotContext slotContext, DamageSource source, boolean recentlyHit, ItemStack stack) {
+        return MapStitch.CONFIG.keepAtlasOnDeath.get() ? DropRule.ALWAYS_KEEP : DropRule.DEFAULT;
     }
     //~}
 }

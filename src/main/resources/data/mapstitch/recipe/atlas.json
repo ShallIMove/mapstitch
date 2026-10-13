@@ -1,3 +1,4 @@
 {
-  "type": "mapstitch:crafting_special_atlas"
+  "type": "mapstitch:crafting_special_atlas",
+  "category": "misc"
 }

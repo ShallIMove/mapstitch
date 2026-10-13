@@ -12,4 +12,11 @@ public class ModRecipes {
             *///?} else {
             RecipeSerializer<>(AtlasRecipe.MAP_CODEC, AtlasRecipe.STREAM_CODEC);
             //?}
+
+    public static final RecipeSerializer<AtlasPinBulkDyeRecipe> ATLAS_PIN_BULK_DYE = new
+            //? <26.1 {
+            /*SimpleCraftingRecipeSerializer<>(AtlasPinBulkDyeRecipe::new);
+             *///?} else {
+            RecipeSerializer<>(AtlasPinBulkDyeRecipe.MAP_CODEC, AtlasPinBulkDyeRecipe.STREAM_CODEC);
+    //?}
 }

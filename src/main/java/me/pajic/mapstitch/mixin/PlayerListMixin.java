@@ -2,6 +2,7 @@ package me.pajic.mapstitch.mixin;
 
 import me.pajic.mapstitch.item.AtlasItem;
 import me.pajic.mapstitch.networking.payload.S2CDimensionIds;
+import me.pajic.mapstitch.pin.PinStorage;
 import me.pajic.mapstitch.platform.MultiLoaderUtil;
 import me.pajic.mapstitch.util.ModUtil;
 import net.minecraft.core.registries.Registries;
@@ -32,6 +33,7 @@ public class PlayerListMixin {
         List<Identifier> dimensionIds = player.registryAccess().lookupOrThrow(Registries.DIMENSION).keySet().stream().toList();
 		MultiLoaderUtil.INSTANCE.s2c(player, new S2CDimensionIds(dimensionIds));
         ModUtil.dimensionIds = dimensionIds;
+        PinStorage.sync(player);
 	}
 
 	@Inject(
@@ -40,5 +42,6 @@ public class PlayerListMixin {
 	)
 	private void removeModDataFromPlayers(ServerPlayer player, CallbackInfo ci) {
 		AtlasItem.clearInitializedMapsForPlayer(player);
+        PinStorage.unload(player);
 	}
 }

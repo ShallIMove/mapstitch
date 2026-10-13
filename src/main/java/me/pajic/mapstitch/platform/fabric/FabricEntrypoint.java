@@ -10,11 +10,14 @@ import me.pajic.mapstitch.datapack.ModDatapacks;
 import me.pajic.mapstitch.item.ModItems;
 import me.pajic.mapstitch.networking.ServerNetworkEvents;
 import me.pajic.mapstitch.networking.payload.C2SEjectMap;
+import me.pajic.mapstitch.networking.payload.C2SPlacePin;
 import me.pajic.mapstitch.networking.payload.C2SPlaySound;
+import me.pajic.mapstitch.networking.payload.C2SRemovePin;
 import me.pajic.mapstitch.networking.payload.C2SSetEjectMode;
 import me.pajic.mapstitch.networking.payload.S2CDimensionIds;
 import me.pajic.mapstitch.networking.payload.S2COpenWorldMapScreen;
 import me.pajic.mapstitch.networking.payload.S2CPlaySound;
+import me.pajic.mapstitch.networking.payload.S2CSyncPins;
 import me.pajic.mapstitch.networking.payload.S2CSyncWorldMap;
 import me.pajic.mapstitch.recipe.ModRecipes;
 import me.pajic.mapstitch.util.CompatFlags;
@@ -53,14 +56,19 @@ public class FabricEntrypoint implements ModInitializer {
         Registry.register(BuiltInRegistries.DATA_COMPONENT_TYPE, MapStitch.id("atlas_eject_filled_maps_first"), ModDataComponents.ATLAS_EJECT_FILLED_MAPS_FIRST);
         Registry.register(BuiltInRegistries.DATA_COMPONENT_TYPE, MapStitch.id("map_center"), ModDataComponents.MAP_CENTER);
         Registry.register(BuiltInRegistries.ITEM, ModItems.ATLAS_KEY, ModItems.ATLAS);
+        Registry.register(BuiltInRegistries.ITEM, ModItems.ATLAS_PIN_KEY, ModItems.ATLAS_PIN);
         Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, MapStitch.id("crafting_special_atlas"), ModRecipes.ATLAS);
+        Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, MapStitch.id("crafting_special_atlas_pin_bulk_dye"), ModRecipes.ATLAS_PIN_BULK_DYE);
         PayloadTypeRegistry.clientboundPlay().register(S2CDimensionIds.TYPE, S2CDimensionIds.CODEC);
         PayloadTypeRegistry.clientboundPlay().register(S2COpenWorldMapScreen.TYPE, S2COpenWorldMapScreen.CODEC);
         PayloadTypeRegistry.clientboundPlay().register(S2CSyncWorldMap.TYPE, S2CSyncWorldMap.CODEC);
         PayloadTypeRegistry.clientboundPlay().register(S2CPlaySound.TYPE, S2CPlaySound.CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(S2CSyncPins.TYPE, S2CSyncPins.CODEC);
         PayloadTypeRegistry.serverboundPlay().register(C2SPlaySound.TYPE, C2SPlaySound.CODEC);
         PayloadTypeRegistry.serverboundPlay().register(C2SSetEjectMode.TYPE, C2SSetEjectMode.CODEC);
         PayloadTypeRegistry.serverboundPlay().register(C2SEjectMap.TYPE, C2SEjectMap.CODEC);
+        PayloadTypeRegistry.serverboundPlay().register(C2SPlacePin.TYPE, C2SPlacePin.CODEC);
+        PayloadTypeRegistry.serverboundPlay().register(C2SRemovePin.TYPE, C2SRemovePin.CODEC);
         ServerPlayNetworking.registerGlobalReceiver(C2SPlaySound.TYPE, (payload, context) ->
                 ServerNetworkEvents.playSound(payload, context.player())
         );
@@ -70,7 +78,15 @@ public class FabricEntrypoint implements ModInitializer {
         ServerPlayNetworking.registerGlobalReceiver(C2SEjectMap.TYPE, (payload, context) ->
                 ServerNetworkEvents.ejectMap(payload, context.player())
         );
+        ServerPlayNetworking.registerGlobalReceiver(C2SPlacePin.TYPE, (payload, context) ->
+                ServerNetworkEvents.placePin(payload, context.player())
+        );
+        ServerPlayNetworking.registerGlobalReceiver(C2SRemovePin.TYPE, (payload, context) ->
+                ServerNetworkEvents.removePin(payload, context.player())
+        );
         CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.TOOLS_AND_UTILITIES).register(output -> {
+            //~ if <26.1 'insertAfter' -> 'addAfter'
+            output.insertAfter(Items.MAP, ModItems.ATLAS_PIN.getDefaultInstance());
             for (int i = 4; i >= 0; i--) {
                 ItemStack atlas = new ItemStack(ModItems.ATLAS);
                 atlas.set(ModDataComponents.ATLAS_SCALE, i);
