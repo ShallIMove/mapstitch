@@ -28,8 +28,8 @@ public class ClientNetworkEvents {
         WorldMapScreen.clearMaps();
     }
 
+    @SuppressWarnings("deprecation")
     public static void playSound(Player player, Holder<SoundEvent> sound) {
-        //noinspection deprecation
         if (sound.is(BuiltInRegistries.SOUND_EVENT.wrapAsHolder(SoundEvents.UI_CARTOGRAPHY_TABLE_TAKE_RESULT))) {
             if (MapStitchClient.CONFIG.sounds.atlasMapCreation.get()) player.playSound(sound.value());
         }

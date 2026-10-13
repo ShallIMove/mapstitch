@@ -35,6 +35,7 @@ import net.minecraft.world.level.saveddata.maps.MapId;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
 import org.apache.commons.lang3.text.WordUtils;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2i;
 
 import java.util.ArrayList;
@@ -91,6 +92,10 @@ public class WorldMapScreen extends Screen {
     private boolean gridAllowed;
 	private boolean follow;
 	private int mapsRendered = 0;
+
+    private boolean renderingAsBackground;
+    private int previewX, previewZ;
+    private @Nullable Integer previewColor;
 
     private boolean pinMode;
     private boolean mapSourcesPresent;
@@ -247,7 +252,7 @@ public class WorldMapScreen extends Screen {
             if (hasCompass && MC.level.dimension().identifier().equals(dimensionId)) renderPlayerMarker(graphics);
             if (gridAllowed && grid) {
                 renderGrid(graphics, xBoundMin, xBoundMax, zBoundMin, zBoundMax);
-                renderPosAtCursor(graphics, mouseX, mouseY, highlightColor);
+                if (!renderingAsBackground) renderPosAtCursor(graphics, mouseX, mouseY, highlightColor);
             }
             renderText(graphics, highlightColor);
             mapsRendered = 0;
@@ -261,6 +266,19 @@ public class WorldMapScreen extends Screen {
         }
         else updateTimer -= a;
 	}
+
+    public void extractAsBackground(GuiGraphicsExtractor graphics, float a) {
+        renderingAsBackground = true;
+        //~ if <26.1 'extractRenderState' -> 'render'
+        extractRenderState(graphics, -10000, -10000, a);
+        renderingAsBackground = false;
+    }
+
+    public void setPinPreview(int x, int z, @Nullable Integer color) {
+        previewX = x;
+        previewZ = z;
+        previewColor = color;
+    }
 
 	private void renderMaps(GuiGraphicsExtractor graphics, int xBoundMin, int xBoundMax, int zBoundMin, int zBoundMax) {
 		if (!MapStitchClient.CONFIG.worldMap.help.get()) help = false;
@@ -459,10 +477,15 @@ public class WorldMapScreen extends Screen {
         for (Pin pin : visible) {
             if (pin != hoveredPin) drawPin(graphics, pinScreenX(pin), pinScreenY(pin), pin.color(), false);
         }
-        if (hoveredPin != null) {
+        if (!renderingAsBackground && hoveredPin != null) {
             int sx = pinScreenX(hoveredPin), sy = pinScreenY(hoveredPin);
             drawPin(graphics, sx, sy, hoveredPin.color(), true);
             renderPinLabel(graphics, hoveredPin, sx, sy);
+        }
+        if (previewColor != null && renderingAsBackground) {
+            int sx = (int) Math.round(worldToScreenX(previewX + 0.5));
+            int sy = (int) Math.round(worldToScreenZ(previewZ + 0.5));
+            drawPin(graphics, sx, sy, previewColor, true);
         }
     }
 
@@ -500,7 +523,7 @@ public class WorldMapScreen extends Screen {
 
     private void openPinPlacement(double sx, double sy) {
         if (!mapSourcesPresent) return;
-        if (gridAllowed && grid && (sy < 12 || sx < getVerticalGridBarWidth(MC.font))) return; // clicked on the grid bars
+        if (gridAllowed && grid && (sy < 12 || sx < getVerticalGridBarWidth(MC.font))) return;
         int wx = Mth.floor(screenToWorldX(sx));
         int wz = Mth.floor(screenToWorldZ(sy));
         //~ if <26.1 'setScreenAndShow' -> 'setScreen'

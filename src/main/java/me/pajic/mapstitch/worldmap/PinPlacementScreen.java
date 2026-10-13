@@ -22,7 +22,10 @@ import java.util.*;
 //? >=26.1 {
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
-//?}
+//?} else {
+/*import com.mojang.blaze3d.systems.RenderSystem;
+import org.lwjgl.opengl.GL11;
+*///?}
 
 public class PinPlacementScreen extends Screen {
 
@@ -36,7 +39,7 @@ public class PinPlacementScreen extends Screen {
             .thenComparingInt(c -> c);
 
     private final Minecraft MC = Minecraft.getInstance();
-    private final Screen parent;
+    private final WorldMapScreen parent;
     private final Identifier dimension;
     private final int x, z;
     private final boolean showCoords;
@@ -50,7 +53,7 @@ public class PinPlacementScreen extends Screen {
     private EditBox nameBox;
     private Button confirmButton;
 
-    public PinPlacementScreen(Screen parent, Identifier dimension, int x, int z, boolean showCoords) {
+    public PinPlacementScreen(WorldMapScreen parent, Identifier dimension, int x, int z, boolean showCoords) {
         super(Component.translatable("mapstitch.gui.pin.title"));
         this.parent = parent;
         this.dimension = dimension;
@@ -115,6 +118,28 @@ public class PinPlacementScreen extends Screen {
         MC.player.playSound(SoundEvents.BUNDLE_INSERT);
         onClose();
     }
+
+    //~ if <26.1 'graphics.nextStratum()' -> 'graphics.flush()' {
+    @Override
+    //~ if <26.1 'extractBackground' -> 'renderBackground'
+    public void extractBackground(@NotNull GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
+        parent.setPinPreview(x, z, selected);
+        //? >=26.1 {
+        parent.extractBackground(graphics, -10000, -10000, a);
+        graphics.nextStratum();
+        //?}
+        parent.extractAsBackground(graphics, a);
+        graphics.nextStratum();
+        //? <26.1
+        //RenderSystem.clear(GL11.GL_DEPTH_BUFFER_BIT, Minecraft.ON_OSX);
+        graphics.fill(0, 0, width, height, 0x60000000);
+        int bottom = confirmButton.getY() + 28;
+        graphics.fill(left - 9, top - 9, left + PANEL_W + 9, bottom + 1, 0xFF000000);
+        graphics.fill(left - 8, top - 8, left + PANEL_W + 8, bottom, 0xE0202020);
+        //? <26.1
+        //graphics.nextStratum();
+    }
+    //~}
 
     @Override
     //~ if <26.1 'extractRenderState' -> 'render'
@@ -209,6 +234,7 @@ public class PinPlacementScreen extends Screen {
 
     @Override
     public void onClose() {
+        parent.setPinPreview(0, 0, null);
         //~ if <26.1 'setScreenAndShow' -> 'setScreen'
         MC.setScreenAndShow(parent);
     }
