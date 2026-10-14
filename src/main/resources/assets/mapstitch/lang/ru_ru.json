@@ -88,7 +88,7 @@
   "mapstitch.chat.pin_share.accepted_sender": "%s принял вашу метку %s.",
   "mapstitch.chat.pin_share.expired": "Запрос на передачу метки от %s истёк.",
   "mapstitch.chat.pin_share.expired_sender": "%s не принял вашу метку %s вовремя. Метка для атласа возвращена.",
-  "mapstitch.chat.pin_share.refunded_offline": "Возвращено меток для атласа: %s (запросы истекли, пока вы были не в сети).",
+  "mapstitch.chat.pin_share.refunded_offline": "Возвращено меток для атласа: %s (запросы истекли, пока вы были не в сети)",
   "mapstitch.chat.pin_share.invalid": "Данный запрос на передачу метки истёк или уже был принят.",
   "mapstitch.chat.pin_share.full": "У вас не может быть больше %s меток.",
   "mapstitch.chat.pin_share.offline": "Игрок больше не в сети.",
