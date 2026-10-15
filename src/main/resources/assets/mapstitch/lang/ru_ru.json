@@ -53,7 +53,7 @@
   "mapstitch.gui.pin_share.search": "Поиск игроков...",
   "mapstitch.gui.pin_share.no_players": "Нет других игроков в сети",
   "mapstitch.gui.pin_share.cost": "Использует 1 похожую метку для атласа (доступно: %s)",
-  "mapstitch.gui.pin_share.no_similar": "Нет метки для атласа похожего цвета",
+  "mapstitch.gui.pin_share.no_similar": "Нет меток для атласа похожего цвета",
   
   "mapstitch.gui.worldmap.button.zoom_in": "+",
   "mapstitch.gui.worldmap.button.zoom_in.tooltip": "Приблизить",
@@ -162,7 +162,7 @@
   "mapstitch.config.netherMap.mode.STATIC": "Статический",
   "mapstitch.config.netherMap.mode.STATIC.desc": "Показывает весь ландшафт на закреплённой высоте, заданной в конфигурации.\nНе рекомендуется, используйте только если у вас проблемы с динамическим режимом.",
   "mapstitch.config.netherMap.staticModeHeight": "Высота статического режима",
-  "mapstitch.config.netherMap.dynamicModeCeilingOffset": "Смещение редактирования динамического режима",
+  "mapstitch.config.netherMap.dynamicModeCeilingOffset": "Смещение потолка в динамическом режиме",
   "mapstitch.config.netherMap.allowedDimensions": "Разрешённые измерения",
   "mapstitch.config.netherMap.allowedDimensions.desc": "Добавьте сюда измерения с потолком для работы улучшенных карт.\nДобавление измерений без потолка не даст никакого эффекта.",
   "mapstitch.config.globetrotter": "Зачарование Странник",
