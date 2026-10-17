@@ -82,10 +82,10 @@
 
   "mapstitch.gui.worldmap.debug.rendered_maps": "[Отладка] Отрисовано карт: %s",
 
-  "mapstitch.gui.cartography.atlas_mode.copy": "Копировать",
-  "mapstitch.gui.cartography.atlas_mode.merge": "Объединить",
-  "mapstitch.gui.cartography.atlas_mode.copy.tooltip": "Копирует заполненные карты верхнего атласа в нижний. Верхний атлас сохраняется.\nНажмите, чтобы переключиться на объединение.",
-  "mapstitch.gui.cartography.atlas_mode.merge.tooltip": "Объединяет оба атласа в один. Оба атласа расходуются.\nНажмите, чтобы переключиться на копирование.",
+  "mapstitch.gui.cartography.atlas_mode.copy": "Копия",
+  "mapstitch.gui.cartography.atlas_mode.merge": "Слияние",
+  "mapstitch.gui.cartography.atlas_mode.copy.tooltip": "Копирует заполненные карты верхнего атласа в нижний. Верхний атлас сохраняется.\nНажмите, чтобы переключиться на слияние.",
+  "mapstitch.gui.cartography.atlas_mode.merge.tooltip": "Объединяет оба атласа в один. Оба атласа расходуются.\nНажмите, чтобы переключиться на копию.",
   "mapstitch.gui.cartography.atlas.not_enough_empty_maps": "Нижнему атласу нужно ещё %s пустых карт или бумаги.",
   "mapstitch.gui.cartography.atlas.scale_mismatch": "У атласов разный масштаб.",
   "mapstitch.gui.cartography.atlas.too_many_items": "В объединённом атласе будет на %s предметов больше, чем допустимо.",
@@ -158,6 +158,9 @@
   "mapstitch.config.maxAtlasItems": "Макс. предметов в атласе",
   "mapstitch.config.atlasPins": "Метки для атласа",
   "mapstitch.config.atlasPins.item": "Предмет «Метка для атласа»",
+  "mapstitch.config.playerMarkers": "Маркеры игроков",
+  "mapstitch.config.playerMarkers.showOthers": "Показывать маркеры других игроков",
+  "mapstitch.config.playerMarkers.showOthers.desc": "Показывает маркеры других игроков на карте мира и мини-карте. В команде показываются только союзники.",
   "mapstitch.config.itemRequirements": "Настройки требований к предметам",
   "mapstitch.config.itemRequirements.compass": "Требовать компас для...",
   "mapstitch.config.itemRequirements.clock": "Требовать часы для...",
@@ -271,6 +274,11 @@
   "mapstitch.client_config.minimapInfo.coordinates": "Координаты",
   "mapstitch.client_config.minimapInfo.biome": "Биомы",
   "mapstitch.client_config.minimapInfo.weather": "Погода",
+  "mapstitch.client_config.playerMarkers": "Маркеры игроков",
+  "mapstitch.client_config.playerMarkers.colorOwn": "Цвет своего маркера",
+  "mapstitch.client_config.playerMarkers.colorOwn.desc": "Окрашивает свой маркер в цвет игрока, определяемый по UUID, если вы не состоите в команде с цветом.",
+  "mapstitch.client_config.playerMarkers.colorOthers": "Цвет маркеров других игроков",
+  "mapstitch.client_config.playerMarkers.colorOthers.desc": "Окрашивает маркеры других игроков в их цвет, определяемый по UUID, если они не состоят в команде с цветом.",
   "mapstitch.client_config.sounds": "Звуки",
   "mapstitch.client_config.sounds.atlasMapCreation": "При создании карт в атласе"
 }
